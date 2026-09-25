@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vestidos de Novia y Alta Costura | Colección Exclusiva</title>
-    <!-- Importación de tipografías elegantes (Playfair Display para títulos y Inter para textos limpios) -->
+    <title>Aura Novias Couture | Vestidos de Novia y Alta Costura</title>
+    <!-- Importación de tipografías elegantes (Playfair Display y Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #fbf9f6; /* Marfil muy suave / fondo pastel cálido */
+            --bg-color: #fbf9f6; /* Marfil muy suave / tono pastel cálido */
             --text-main: #2b2b2b;
             --text-muted: #736e65;
             --accent-gold: #c5a059;
@@ -80,7 +80,7 @@
             padding: 0 20px;
         }
 
-        .hero-content max-width {
+        .hero-content {
             max-width: 800px;
         }
 
@@ -220,19 +220,29 @@
             color: var(--white);
         }
 
-        /* Footer */
+        /* Footer Corporativo y Legal */
         footer {
             background-color: #212121;
             color: #d1ccb8;
             text-align: center;
             padding: 50px 20px;
             font-size: 0.85rem;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             margin-top: 100px;
+            line-height: 1.6;
         }
 
         footer p {
-            margin: 5px 0;
+            margin: 8px 0;
+        }
+
+        .footer-tech {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: #9e998d;
+            letter-spacing: 0.5px;
+            border-top: 1px solid #333333;
+            padding-top: 20px;
         }
 
         @media(max-width: 768px) {
@@ -244,7 +254,7 @@
 </head>
 <body>
 
-    <!-- Cabecera estilo boutique de novia -->
+    <!-- Cabecera boutique -->
     <header>
         <a href="#" class="brand-logo">Aura Novias</a>
         <nav>
@@ -264,7 +274,7 @@
         </div>
     </section>
 
-    <!-- Catálogo de Vestidos (Dinámico para enlazar con tu base de datos) -->
+    <!-- Catálogo de Vestidos -->
     <section id="coleccion" class="catalog-container">
         <h2 class="section-title">Colección Exclusiva</h2>
         <p class="section-subtitle">Cada diseño es seleccionado cuidadosamente para realzar tu belleza natural.</p>
@@ -311,11 +321,13 @@
         </div>
     </section>
 
-    <!-- Footer Institucional -->
+    <!-- Footer Institucional con Declaración Tecnológica -->
     <footer>
         <p><strong>Aura Novias Couture</strong></p>
         <p>Especialistas en Vestidos de Novia y Accesorios de Alta Costura.</p>
-        <p style="margin-top: 20px; font-size: 0.75rem; color: #888;">Powered by AXOPTEC Tecnologías.</p>
+        <div class="footer-tech">
+            Aura Novias © 2026. Plataforma de comercio electrónico desarrollada, operada bajo licencia y tecnología provistas por AXOPTEC.
+        </div>
     </footer>
 
 </body>
