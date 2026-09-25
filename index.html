@@ -2,56 +2,321 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Colección de Vestidos de Novia | Alta Costura</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vestidos de Novia y Alta Costura | Colección Exclusiva</title>
+    <!-- Importación de tipografías elegantes (Playfair Display para títulos y Inter para textos limpios) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; font-family: 'Playfair Display', serif; background: #fdfbf7; color: #2c2c2c; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background: #ffffff; border-bottom: 1px solid #e6e2db; }
-        .logo { font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
-        nav a { margin-left: 25px; text-decoration: none; color: #2c2c2c; font-size: 0.9rem; font-family: 'Inter', sans-serif; letter-spacing: 1px; }
-        .hero { text-align: center; padding: 80px 20px; background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('hero-novias.jpg') center/cover; color: #fff; }
-        .hero h1 { font-size: 3rem; margin-bottom: 10px; font-weight: 400; letter-spacing: 1px; }
-        .btn-agenda { background: #ffffff; color: #2c2c2c; padding: 12px 30px; text-decoration: none; font-family: 'Inter', sans-serif; font-size: 0.85rem; letter-spacing: 1px; border-radius: 4px; display: inline-block; margin-top: 20px; transition: 0.3s; }
-        .btn-agenda:hover { background: #f5f2ec; }
-        .catalog { padding: 60px 50px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .dress-card { background: #ffffff; border: 1px solid #e6e2db; border-radius: 8px; overflow: hidden; text-align: center; padding-bottom: 20px; }
-        .dress-card img { width: 100%; height: 380px; object-fit: cover; }
-        .dress-card h3 { font-size: 1.1rem; margin: 15px 0 5px 0; font-weight: 400; }
-        .dress-card p { font-family: 'Inter', sans-serif; color: #7a756f; font-size: 0.9rem; }
+        :root {
+            --bg-color: #fbf9f6; /* Marfil muy suave / fondo pastel cálido */
+            --text-main: #2b2b2b;
+            --text-muted: #736e65;
+            --accent-gold: #c5a059;
+            --border-color: #e6e0d8;
+            --white: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .brand-logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+        }
+
+        /* Barra Superior / Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 60px;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-main);
+            text-decoration: none;
+        }
+
+        nav a {
+            margin-left: 35px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent-gold);
+        }
+
+        /* Sección Hero / Portada Principal */
+        .hero {
+            position: relative;
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('https://images.unsplash.com/photo-1594552072238-b8a3272be6cc?w=1600&auto=format&fit=crop&q=80') center/cover no-repeat;
+            color: var(--white);
+            padding: 0 20px;
+        }
+
+        .hero-content max-width {
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .btn-primary {
+            background-color: var(--white);
+            color: var(--text-main);
+            padding: 14px 35px;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-weight: 500;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-gold);
+            color: var(--white);
+        }
+
+        /* Sección de Catálogo / Colección */
+        .catalog-container {
+            max-width: 1300px;
+            margin: 80px auto;
+            padding: 0 30px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 50px;
+            letter-spacing: 0.5px;
+        }
+
+        .grid-dresses {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .dress-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dress-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .dress-image-wrapper {
+            position: relative;
+            height: 420px;
+            overflow: hidden;
+            background-color: #f1ede6;
+        }
+
+        .dress-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .dress-card:hover .dress-image-wrapper img {
+            transform: scale(1.03);
+        }
+
+        .dress-info {
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        .dress-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .dress-title {
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+            color: var(--text-main);
+        }
+
+        .dress-price {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        .btn-detail {
+            background-color: transparent;
+            border: 1px solid var(--text-main);
+            color: var(--text-main);
+            padding: 10px 20px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-detail:hover {
+            background-color: var(--text-main);
+            color: var(--white);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #212121;
+            color: #d1ccb8;
+            text-align: center;
+            padding: 50px 20px;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin-top: 100px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        @media(max-width: 768px) {
+            header { padding: 20px; flex-direction: column; gap: 15px; }
+            nav a { margin: 0 10px; }
+            .hero h1 { font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Cabecera estilo boutique de novia -->
     <header>
-        <div class="logo">Aura Novias Couture</div>
+        <a href="#" class="brand-logo">Aura Novias</a>
         <nav>
             <a href="#coleccion">Colección</a>
-            <a href="#experiencia">Experiencia</a>
-            <a href="#contacto">Contacto / Agenda</a>
+            <a href="#siluetas">Siluetas</a>
+            <a href="#experiencia">La Experiencia</a>
+            <a href="#contacto">Agenda tu Cita</a>
         </nav>
     </header>
 
+    <!-- Portada Principal -->
     <section class="hero">
-        <h1>El Vestido de tus Sueños</h1>
-        <p style="font-family: 'Inter', sans-serif; font-size: 1.1rem; letter-spacing: 0.5px;">Elegancia, delicadeza y sofisticación en cada detalle.</p>
-        <a href="#contacto" class="btn-agenda">Agendar Prueba de Vestido</a>
+        <div class="hero-content">
+            <h1>Magia y Elegancia en tu Gran Día</h1>
+            <p>Descubre nuestra exclusiva selección de vestidos de alta costura inspirados en la sofisticación moderna.</p>
+            <a href="#coleccion" class="btn-primary">Ver Colección Online</a>
+        </div>
     </section>
 
-    <section id="coleccion" class="catalog">
-        <!-- Ejemplo de Tarjeta de Vestido -->
-        <div class="dress-card">
-            <img src="https://images.unsplash.com/photo-1594552072238-b8a3272be6cc?w=600&auto=format&fit=crop&q=60" alt="Vestido de Novia">
-            <h3>Modelo L'Amour</h3>
-            <p>Silueta Princesa con Encaje Francés</p>
-        </div>
-        <div class="dress-card">
-            <img src="https://images.unsplash.com/photo-1546804735-85d1cb45e32e?w=600&auto=format&fit=crop&q=60" alt="Vestido de Novia">
-            <h3>Modelo Seraphine</h3>
-            <p>Corte Sirena Minimalista y Detalle en Espalda</p>
-        </div>
-        <div class="dress-card">
-            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=60" alt="Vestido de Novia">
-            <h3>Modelo Celeste</h3>
-            <p>Boho Chic con Mangas Largas Transparentes</p>
+    <!-- Catálogo de Vestidos (Dinámico para enlazar con tu base de datos) -->
+    <section id="coleccion" class="catalog-container">
+        <h2 class="section-title">Colección Exclusiva</h2>
+        <p class="section-subtitle">Cada diseño es seleccionado cuidadosamente para realzar tu belleza natural.</p>
+
+        <div class="grid-dresses">
+            <!-- Tarjeta 1 -->
+            <div class="dress-card">
+                <div class="dress-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1546804735-85d1cb45e32e?w=600&auto=format&fit=crop&q=80" alt="Vestido de Novia 1">
+                </div>
+                <div class="dress-info">
+                    <div class="dress-category">Corte Princesa</div>
+                    <h3 class="dress-title">Modelo Valentina</h3>
+                    <div class="dress-price">Desde $890.000 CLP</div>
+                    <button class="btn-detail">Consultar / Reservar Cita</button>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2 -->
+            <div class="dress-card">
+                <div class="dress-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&auto=format&fit=crop&q=80" alt="Vestido de Novia 2">
+                </div>
+                <div class="dress-info">
+                    <div class="dress-category">Silueta Sirena</div>
+                    <h3 class="dress-title">Modelo Isabella</h3>
+                    <div class="dress-price">Desde $950.000 CLP</div>
+                    <button class="btn-detail">Consultar / Reservar Cita</button>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3 -->
+            <div class="dress-card">
+                <div class="dress-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1594552072238-b8a3272be6cc?w=600&auto=format&fit=crop&q=80" alt="Vestido de Novia 3">
+                </div>
+                <div class="dress-info">
+                    <div class="dress-category">Estilo Boho Chic</div>
+                    <h3 class="dress-title">Modelo Emilia</h3>
+                    <div class="dress-price">Desde $780.000 CLP</div>
+                    <button class="btn-detail">Consultar / Reservar Cita</button>
+                </div>
+            </div>
         </div>
     </section>
+
+    <!-- Footer Institucional -->
+    <footer>
+        <p><strong>Aura Novias Couture</strong></p>
+        <p>Especialistas en Vestidos de Novia y Accesorios de Alta Costura.</p>
+        <p style="margin-top: 20px; font-size: 0.75rem; color: #888;">Powered by AXOPTEC Tecnologías.</p>
+    </footer>
+
 </body>
 </html>
