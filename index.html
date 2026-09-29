@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-color: #fbf9f6; /* Marfil muy suave / tono pastel cálido */
+            --bg-color: #fbf9f6;
             --text-main: #2b2b2b;
             --text-muted: #736e65;
             --accent-gold: #c5a059;
@@ -303,12 +303,12 @@
         </div>
     </section>
 
-    <!-- Catálogo de Vestidos Dinámico conectado a Supabase y Categorías -->
+    <!-- Catálogo de Vestidos Dinámico estrictamente filtrado por cliente -->
     <section id="coleccion" class="catalog-container">
         <h2 class="section-title">Colección Exclusiva</h2>
         <p class="section-subtitle">Cada diseño es seleccionado cuidadosamente para realzar tu belleza natural.</p>
 
-        <!-- Filtros de Categorías Generados Dinámicamente desde el Panel de la Dueña -->
+        <!-- Filtros de Categorías del Cliente -->
         <div id="categoriesFilterContainer" class="categories-filter">
             <button class="filter-btn active" onclick="filterCatalog('todos', this)">Todas</button>
         </div>
@@ -336,7 +336,7 @@
         let allProducts = [];
         let currentFilter = 'todos';
 
-        // Categorías por defecto del Atelier
+        // Categorías por defecto si no hay personalización previa
         let defaultCategories = [
             { id: "alta-costura", name: "👑 Alta Costura y Princesa" },
             { id: "civil", name: "💍 Vestidos de Matrimonio Civil" },
@@ -345,8 +345,9 @@
             { id: "joyeria", name: "💎 Joyería Nupcial" }
         ];
 
+        // OBTENER CLIENT_ID ESTRICTAMENTE DE LA URL
         const urlParams = new URLSearchParams(window.location.search);
-        const CLIENT_ID = urlParams.get('client') || 'plantas';
+        const CLIENT_ID = urlParams.get('client');
 
         function getSupabase() {
             if (!clientDb && window.supabase) {
@@ -356,6 +357,7 @@
         }
 
         function getSavedCategories() {
+            if (!CLIENT_ID) return defaultCategories;
             const stored = localStorage.getItem(`atelier_categories_${CLIENT_ID}`);
             if (stored) {
                 try { return JSON.parse(stored); } catch(e) {}
@@ -382,6 +384,18 @@
         }
 
         async function loadStoreCatalog() {
+            const grid = document.getElementById('catalogGrid');
+
+            // VALIDACIÓN CRÍTICA: Bloquear si no hay client_id en la URL
+            if (!CLIENT_ID) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; color: #bc4749; padding: 40px;">
+                        <h3>⚠️ Enlace incompleto</h3>
+                        <p style="margin-top: 10px; color: var(--text-muted);">Por favor accede utilizando el enlace personalizado de tu tienda (ej: index.html?client=tu_id).</p>
+                    </div>`;
+                return;
+            }
+
             const db = getSupabase();
             if (!db) {
                 setTimeout(loadStoreCatalog, 800);
@@ -391,6 +405,7 @@
             renderCategoryFilters();
 
             try {
+                // CONSULTA ESTRICTAMENTE FILTRADA POR EL CLIENT_ID DE LA URL
                 const { data, error } = await db
                     .from('productos')
                     .select('*')
@@ -398,14 +413,14 @@
                     .order('id', { ascending: true });
 
                 if (error) {
-                    document.getElementById('catalogGrid').innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #bc4749;">Error al cargar la colección.</div>`;
+                    grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #bc4749;">Error al cargar la colección: ${error.message}</div>`;
                     return;
                 }
 
                 allProducts = data || [];
                 renderProducts();
             } catch (err) {
-                document.getElementById('catalogGrid').innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #bc4749;">Error de conexión.</div>`;
+                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #bc4749;">Error de conexión con la base de datos.</div>`;
             }
         }
 
@@ -415,7 +430,6 @@
             const catMap = {};
             cats.forEach(c => catMap[c.id] = c.name);
 
-            // Filtrar por categoría o mostrar agotados/disponibles
             const filtered = currentFilter === 'todos' 
                 ? allProducts 
                 : allProducts.filter(p => p.categoria === currentFilter);
