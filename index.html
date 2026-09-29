@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-color: #fbf9f6;
+            --bg-color: #fbf9f6; /* Marfil muy suave / tono pastel cálido */
             --text-main: #2b2b2b;
             --text-muted: #736e65;
             --accent-gold: #c5a059;
@@ -303,7 +303,7 @@
         </div>
     </section>
 
-    <!-- Catálogo de Vestidos Dinámico estrictamente filtrado por cliente -->
+    <!-- Catálogo de Vestidos Dinámico conectado estrictamente al cliente -->
     <section id="coleccion" class="catalog-container">
         <h2 class="section-title">Colección Exclusiva</h2>
         <p class="section-subtitle">Cada diseño es seleccionado cuidadosamente para realzar tu belleza natural.</p>
@@ -336,7 +336,7 @@
         let allProducts = [];
         let currentFilter = 'todos';
 
-        // Categorías por defecto si no hay personalización previa
+        // Categorías por defecto del Atelier
         let defaultCategories = [
             { id: "alta-costura", name: "👑 Alta Costura y Princesa" },
             { id: "civil", name: "💍 Vestidos de Matrimonio Civil" },
