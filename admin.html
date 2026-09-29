@@ -1102,7 +1102,7 @@
 
         async function changeVarQty(productId, varIndex, delta) {
             const client = getSupabase();
-            The { data: p, error } = await client.from('productos').select('opciones').eq('id', productId).single();
+            const { data: p, error } = await client.from('productos').select('opciones').eq('id', productId).single();
             if (error || !p || !p.opciones) return;
 
             let updatedOpciones = [...p.opciones];
