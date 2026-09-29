@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier Novias - Panel de Control Multi-Tenant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Cropper.js (Librería para editar y recortar imágenes) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        :root {
+            --bg-ivory: #faf7f5;
+            --card-bg: #ffffff;
+            --text-main: #3a3532;
+            --text-muted: #786f68;
+            --primary-rose: #d4a373;
+            --rose-hover: #bc8a5c;
+            --rose-light: rgba(212, 163, 115, 0.12);
+            --border-color: rgba(212, 163, 115, 0.25);
+            --gold-accent: #c59b27;
+            --badge-gold-bg: rgba(197, 155, 39, 0.15);
+            --success-color: #588157;
+            --success-bg: rgba(88, 129, 87, 0.15);
+            --danger-color: #bc4749;
+            --danger-bg: rgba(188, 71, 73, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+        body { background-color: var(--bg-ivory); min-height: 100vh; color: var(--text-main); padding: 25px 15px; }
+
+        h1, h2, h3, h4 { font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+
+        .login-card {
+            max-width: 400px;
+            margin: 100px auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 35px 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(180, 160, 150, 0.15);
+        }
+        .login-card h2 { font-size: 2.2rem; color: var(--primary-rose); margin-bottom: 8px; }
+        .login-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; font-family: 'Montserrat', sans-serif; }
+        .login-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #fcfbfa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        .login-input:focus { border-color: var(--primary-rose); }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-rose);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-login:hover { background: var(--rose-hover); }
+
+        .dashboard-container {
+            display: none;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .dash-header h1 { font-size: 2rem; color: var(--primary-rose); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .badge-client { font-size: 0.85rem; color: var(--gold-accent); background: var(--badge-gold-bg); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(197, 155, 39, 0.3); font-family: 'Montserrat', sans-serif; }
+        .btn-logout {
+            background: var(--danger-bg);
+            color: var(--danger-color);
+            border: 1px solid rgba(188, 71, 73, 0.4);
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .btn-logout:hover { background: var(--danger-color); color: #fff; }
+
+        .form-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(180, 160, 150, 0.1);
+            transition: border-color 0.3s ease;
+        }
+        .form-card.edit-mode {
+            border-color: var(--gold-accent);
+            box-shadow: 0 0 20px rgba(197, 155, 39, 0.15);
+        }
+        .form-card h3 { font-size: 1.5rem; color: var(--primary-rose); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+        .form-control {
+            padding: 10px 14px;
+            background: #fcfbfa;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .form-control:focus { border-color: var(--primary-rose); }
+        textarea.form-control { resize: vertical; min-height: 70px; }
+
+        .preview-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 6px;
+            border: 1px dashed var(--primary-rose);
+            display: none;
+        }
+
+        .variants-box {
+            background: #fdfbf9;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+        .variants-box h4 { font-size: 1.1rem; color: var(--primary-rose); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-add-var {
+            background: #fff;
+            color: var(--primary-rose);
+            border: 1px solid var(--primary-rose);
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-add-var:hover { background: var(--primary-rose); color: #fff; }
+        .variant-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1.5fr 0.8fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .btn-remove-var {
+            background: transparent;
+            color: var(--danger-color);
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .btn-submit-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .btn-submit {
+            background: var(--primary-rose);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover { background: var(--rose-hover); }
+        .btn-cancel-edit {
+            background: rgba(120, 111, 104, 0.1);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+        }
+        .btn-cancel-edit:hover { background: rgba(120, 111, 104, 0.2); }
+
+        .table-responsive {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow-x: auto;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(180, 160, 150, 0.1);
+        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th { color: var(--primary-rose); font-weight: 700; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; }
+        .table-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); }
+        
+        .price-sale { color: var(--success-color); font-weight: 700; }
+        .price-before { color: var(--text-muted); font-size: 0.8rem; text-decoration: line-through; margin-left: 5px; }
+
+        .stock-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fcfbfa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 3px 8px;
+        }
+        .btn-qty {
+            background: transparent;
+            border: none;
+            color: var(--primary-rose);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+        .btn-qty:hover { color: var(--text-main); }
+        .qty-val { font-weight: 700; font-size: 0.9rem; min-width: 24px; text-align: center; }
+
+        .badge-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .badge-disponible { background: var(--success-bg); color: var(--success-color); border: 1px solid rgba(88, 129, 87, 0.3); }
+        .badge-agotado { background: var(--danger-bg); color: var(--danger-color); border: 1px solid rgba(188, 71, 73, 0.3); }
+
+        .var-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fdfbf9;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            margin: 3px;
+        }
+        .var-chip.var-agotada { opacity: 0.5; border-color: rgba(188, 71, 73, 0.3); }
+
+        .actions-group { display: flex; gap: 8px; align-items: center; }
+        .btn-edit {
+            background: var(--badge-gold-bg);
+            border: 1px solid rgba(197, 155, 39, 0.4);
+            color: var(--gold-accent);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-edit:hover { background: var(--gold-accent); color: #fff; }
+
+        .btn-delete {
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .btn-delete:hover { background: var(--danger-color); color: #fff; }
+
+        /* Estilos del Modal de Recorte de Imagen */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(58, 53, 50, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            font-size: 1.3rem;
+            color: var(--primary-rose);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .cropper-container-box {
+            max-height: 380px;
+            background: #faf7f5;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+        .cropper-container-box img {
+            max-width: 100%;
+            display: block;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-modal-action {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-rotate { background: #fcfbfa; color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-rotate:hover { background: rgba(212, 163, 115, 0.1); }
+        .btn-cancel-crop { background: var(--danger-bg); color: var(--danger-color); border: 1px solid rgba(188, 71, 73, 0.4); }
+        .btn-confirm-crop { background: var(--primary-rose); color: #fff; }
+        .btn-confirm-crop:hover { background: var(--rose-hover); }
+    </style>
+</head>
+<body>
+
+    <div id="loginSection" class="login-card">
+        <h2>🤍 Atelier Novias</h2>
+        <p>Panel de Administración y Colecciones</p>
+        <input type="password" id="adminPassInput" class="login-input" placeholder="Ingresa la contraseña maestra..." onkeydown="if(event.key==='Enter') verifyLogin()">
+        <button type="button" class="btn-login" onclick="verifyLogin()">Iniciar Sesión</button>
+    </div>
+
+    <div id="dashboardSection" class="dashboard-container">
+        <div class="dash-header">
+            <h1 id="dashMainTitle">🕊️ Gestión de Colección Nupcial</h1>
+            <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+        </div>
+
+        <div id="formCardContainer" class="form-card">
+            <h3 id="formTitle">✨ Agregar Nuevo Diseño / Vestido</h3>
+            <form id="productForm" onsubmit="handleFormSubmit(event)">
+                <input type="hidden" id="editProductId" value="">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre del Diseño / Vestido *</label>
+                        <input type="text" id="pNombre" class="form-control" placeholder="Ej: Vestido Alta Costura Seraphina" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <select id="pCategoria" class="form-control" required>
+                            <option value="alta-costura">👑 Alta Costura y Princesa</option>
+                            <option value="civil">💍 Vestidos de Matrimonio Civil</option>
+                            <option value="velos">✨ Velos y Tocados</option>
+                            <option value="zapatos">👠 Zapatos y Complementos</option>
+                            <option value="joyeria">💎 Joyería Nupcial</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Precio Numérico (CLP) * (Ej: 450000)</label>
+                        <input type="number" id="pPrecioNum" class="form-control" placeholder="450000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Precio Antes / Lista (Opcional)</label>
+                        <input type="number" id="pPrecioAntes" class="form-control" placeholder="Ej: 520000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stock / Disponibilidad en Tienda *</label>
+                        <input type="number" id="pStock" class="form-control" value="2" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Foto Principal (Catálogo) *</label>
+                        <input type="file" id="pFotoFile" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewMain', 'pFoto')">
+                        <input type="hidden" id="pFoto" required>
+                        <img id="previewMain" class="preview-img" alt="Vista previa">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Foto de Detalle o Espalda (Opcional)</label>
+                        <input type="file" id="pFotoGrandeFile" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewGrande', 'pFotoGrande')">
+                        <input type="hidden" id="pFotoGrande">
+                        <img id="previewGrande" class="preview-img" alt="Vista previa grande">
+                    </div>
+
+                    <div class="form-group">
+                        <label>¿Es Destacado / Novedad?</label>
+                        <select id="pEsNovedad" class="form-control">
+                            <option value="false">No</option>
+                            <option value="true">Sí (Mostrar en Inicio)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="variants-box">
+                    <h4>
+                        🎨 Tallas / Variantes Disponibles (Opcional)
+                        <button type="button" class="btn-add-var" onclick="addVariantRow()">+ Agregar Talla</button>
+                    </h4>
+                    <div id="variantsContainer"></div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Detalles del Diseño (Silueta, Tejido, Ajustes)</label>
+                    <textarea id="pCuidados" class="form-control" placeholder="✨ Silueta: ...&#10;🧵 Tejido / Encaje: ...&#10;📏 Ajustes incluidos: ..."></textarea>
+                </div>
+
+                <div class="btn-submit-group">
+                    <button type="submit" id="btnSubmitForm" class="btn-submit">💾 Guardar Diseño</button>
+                    <button type="button" id="btnCancelEdit" class="btn-cancel-edit" onclick="resetFormToCreate()">Cancelar Edición</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <h3 style="color:var(--primary-rose); margin-bottom:15px;">📋 Inventario del Atelier (<span id="totalCount">0</span>)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock Unidades</th>
+                        <th>Tallas / Opciones</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTableBody">
+                    <tr><td colspan="8" style="text-align:center;">Cargando inventario...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL DE CORTE Y EDICIÓN DE IMÁGENES -->
+    <div id="cropModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">✂️ Ajustar y Recortar Imagen</div>
+            <div class="cropper-container-box">
+                <img id="cropImageTarget" src="" alt="Imagen a recortar">
+            </div>
+            <div class="modal-actions">
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="btn-modal-action btn-rotate" onclick="rotateCropImage(-90)">↺ -90°</button>
+                    <button type="button" class="btn-modal-action btn-rotate" onclick="rotateCropImage(90)">↻ +90°</button>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="btn-modal-action btn-cancel-crop" onclick="closeCropModal()">Cancelar</button>
+                    <button type="button" class="btn-modal-action btn-confirm-crop" onclick="confirmCropImage()">Recortar y Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://qxyilgtswpvfolavuqde.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4eWlsZ3Rzd3B2Zm9sYXZ1cWRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMjU4MjAsImV4cCI6MjEwNTcwMTgyMH0.qCvuLeJA53O5ykdWTGvZzPKOZs5zWqTg3JgoxsxyiuM";
+        let mbAdminDb = null;
+        let cachedProducts = [];
+
+        let cropperInstance = null;
+        let currentFileInput = null;
+        let currentPreviewImgId = '';
+        let currentHiddenInputId = '';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const CLIENT_ID = urlParams.get('client') || 'plantas';
+        document.getElementById('dashMainTitle').innerHTML = `🕊️ Gestión Atelier <span class="badge-client">Cliente: ${CLIENT_ID}</span>`;
+
+        function getSupabase() {
+            if (!mbAdminDb && window.supabase) {
+                mbAdminDb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+            return mbAdminDb;
+        }
+
+        const ADMIN_SECRET = "16De@ctubre";
+
+        function verifyLogin() {
+            const inputVal = document.getElementById('adminPassInput').value.trim();
+            if (inputVal === ADMIN_SECRET) {
+                sessionStorage.setItem('mb_admin_auth', 'true');
+                showDashboard();
+            } else {
+                alert("Contraseña incorrecta 🔒");
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            loadInventory();
+        }
+
+        function logout() {
+            sessionStorage.removeItem('mb_admin_auth');
+            location.reload();
+        }
+
+        function initCropProcess(input, previewId, hiddenInputId) {
+            const file = input.files[0];
+            if (!file) return;
+
+            currentFileInput = input;
+            currentPreviewImgId = previewId;
+            currentHiddenInputId = hiddenInputId;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const targetImg = document.getElementById('cropImageTarget');
+                targetImg.src = e.target.result;
+
+                document.getElementById('cropModal').style.display = 'flex';
+
+                if (cropperInstance) {
+                    cropperInstance.destroy();
+                }
+
+                cropperInstance = new Cropper(targetImg, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 0.9,
+                    responsive: true
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function rotateCropImage(degree) {
+            if (cropperInstance) {
+                cropperInstance.rotate(degree);
+            }
+        }
+
+        function closeCropModal() {
+            document.getElementById('cropModal').style.display = 'none';
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+            if (currentFileInput) {
+                currentFileInput.value = '';
+            }
+        }
+
+        function confirmCropImage() {
+            if (!cropperInstance) return;
+
+            const canvas = cropperInstance.getCroppedCanvas({
+                width: 800,
+                height: 800
+            });
+
+            const base64Cropped = canvas.toDataURL('image/jpeg', 0.85);
+
+            if (currentPreviewImgId) {
+                const prev = document.getElementById(currentPreviewImgId);
+                prev.src = base64Cropped;
+                prev.style.display = 'block';
+            }
+
+            if (currentHiddenInputId) {
+                document.getElementById(currentHiddenInputId).value = base64Cropped;
+            } else if (currentFileInput && currentFileInput.classList.contains('var-file')) {
+                currentFileInput.parentElement.querySelector('.var-img').value = base64Cropped;
+            }
+
+            document.getElementById('cropModal').style.display = 'none';
+            cropperInstance.destroy();
+            cropperInstance = null;
+        }
+
+        function addVariantRow(name = '', img = '', stock = 2) {
+            const container = document.getElementById('variantsContainer');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML = `
+                <input type="text" class="form-control var-name" placeholder="Talla (ej: Talla 38)" value="${name}" required>
+                <input type="file" class="form-control var-file" accept="image/*" onchange="initCropProcess(this, '', '')">
+                <input type="hidden" class="var-img" value="${img}">
+                <input type="number" class="form-control var-stock" placeholder="Stock" value="${stock}" min="0" required>
+                <button type="button" class="btn-remove-var" onclick="this.parentElement.remove()">✕</button>
+            `;
+            container.appendChild(row);
+        }
+
+        async function loadInventory() {
+            const client = getSupabase();
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Cargando inventario...</td></tr>';
+
+            if (!client) {
+                setTimeout(loadInventory, 800);
+                return;
+            }
+
+            try {
+                const { data: productos, error } = await client
+                    .from('productos')
+                    .select('*')
+                    .eq('client_id', CLIENT_ID)
+                    .order('id', { ascending: true });
+
+                if (error) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger-color);">Error: ${error.message}</td></tr>`;
+                    return;
+                }
+
+                cachedProducts = productos || [];
+                document.getElementById('totalCount').innerText = cachedProducts.length;
+
+                if (cachedProducts.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay diseños registrados para este cliente.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                cachedProducts.forEach(p => {
+                    const currentStock = p.stock !== undefined ? p.stock : 2;
+                    const isAgotado = (p.estado === 'agotado' || currentStock <= 0);
+
+                    let variantesHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">Sin tallas adicionales</span>';
+                    if (p.opciones && Array.isArray(p.opciones) && p.opciones.length > 0) {
+                        variantesHtml = p.opciones.map((opt, idx) => {
+                            const optStock = opt.stock !== undefined ? opt.stock : 2;
+                            const isVarAgotada = (optStock <= 0 || opt.status === 'agotado');
+                            return `
+                                <div class="var-chip ${isVarAgotada ? 'var-agotada' : ''}">
+                                    <span>📏 ${opt.name}</span>
+                                    <div class="stock-control">
+                                        <button class="btn-qty" onclick="changeVarQty(${p.id}, ${idx}, -1)">-</button>
+                                        <span class="qty-val">${optStock}</span>
+                                        <button class="btn-qty" onclick="changeVarQty(${p.id}, ${idx}, 1)">+</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+
+                    const hasOffer = p.precio_antes && parseInt(p.precio_antes) > (p.precio_num || 0);
+                    const formattedBefore = hasOffer ? '$' + parseInt(p.precio_antes).toLocaleString('es-CL') : '';
+
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><img src="${p.foto || 'fondo.jpg'}" class="table-img" onerror="this.src='fondo.jpg'"></td>
+                        <td><strong>${p.nombre}</strong></td>
+                        <td>${p.categoria}</td>
+                        <td>
+                            <span class="price-sale">${p.precio}</span>
+                            ${hasOffer ? `<span class="price-before">${formattedBefore}</span>` : ''}
+                        </td>
+                        <td>
+                            <div class="stock-control">
+                                <button class="btn-qty" onclick="changeProductQty(${p.id}, ${currentStock}, -1)">-</button>
+                                <span class="qty-val">${currentStock}</span>
+                                <button class="btn-qty" onclick="changeProductQty(${p.id}, ${currentStock}, 1)">+</button>
+                            </div>
+                        </td>
+                        <td>${variantesHtml}</td>
+                        <td>
+                            <span class="badge-status ${isAgotado ? 'badge-agotado' : 'badge-disponible'}" onclick="toggleStock(${p.id}, '${p.estado}')">
+                                ${isAgotado ? '⚠️ Agotado' : '✅ Disponible'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions-group">
+                                <button class="btn-edit" onclick="startEditProduct(${p.id})">✏️ Editar</button>
+                                <button class="btn-delete" onclick="deleteProduct(${p.id}, '${p.nombre}')">🗑️</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger-color);">Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function startEditProduct(productId) {
+            const product = cachedProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('pNombre').value = product.nombre;
+            document.getElementById('pCategoria').value = product.categoria;
+            document.getElementById('pPrecioNum').value = product.precio_num || parseInt(product.precio.replace(/[^0-9]/g, '')) || 0;
+            document.getElementById('pPrecioAntes').value = (product.precio_antes !== null && product.precio_antes !== undefined) ? product.precio_antes : '';
+            document.getElementById('pStock').value = product.stock !== undefined ? product.stock : 2;
+            
+            document.getElementById('pFoto').value = product.foto || '';
+            const prevMain = document.getElementById('previewMain');
+            if (product.foto) {
+                prevMain.src = product.foto;
+                prevMain.style.display = 'block';
+            } else {
+                prevMain.style.display = 'none';
+            }
+
+            document.getElementById('pFotoGrande').value = product.foto_grande || '';
+            const prevGrande = document.getElementById('previewGrande');
+            if (product.foto_grande) {
+                prevGrande.src = product.foto_grande;
+                prevGrande.style.display = 'block';
+            } else {
+                prevGrande.style.display = 'none';
+            }
+
+            document.getElementById('pEsNovedad').value = product.es_novedad ? 'true' : 'false';
+            document.getElementById('pCuidados').value = product.cuidados || '';
+
+            const variantsContainer = document.getElementById('variantsContainer');
+            variantsContainer.innerHTML = '';
+            if (product.opciones && Array.isArray(product.opciones)) {
+                product.opciones.forEach(opt => {
+                    addVariantRow(opt.name, opt.img || '', opt.stock !== undefined ? opt.stock : 2);
+                });
+            }
+
+            document.getElementById('formTitle').innerText = `✏️ Editando: ${product.nombre}`;
+            document.getElementById('btnSubmitForm').innerText = '💾 Guardar Cambios';
+            document.getElementById('btnCancelEdit').style.display = 'inline-block';
+            document.getElementById('formCardContainer').classList.add('edit-mode');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetFormToCreate() {
+            document.getElementById('productForm').reset();
+            document.getElementById('editProductId').value = '';
+            document.getElementById('pPrecioAntes').value = '';
+            document.getElementById('pFoto').value = '';
+            document.getElementById('pFotoGrande').value = '';
+            document.getElementById('previewMain').style.display = 'none';
+            document.getElementById('previewGrande').style.display = 'none';
+            document.getElementById('variantsContainer').innerHTML = '';
+            document.getElementById('pStock').value = '2';
+            document.getElementById('formTitle').innerText = '✨ Agregar Nuevo Diseño / Vestido';
+            document.getElementById('btnSubmitForm').innerText = '💾 Guardar Diseño';
+            document.getElementById('btnCancelEdit').style.display = 'none';
+            document.getElementById('formCardContainer').classList.remove('edit-mode');
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const client = getSupabase();
+            const editId = document.getElementById('editProductId').value;
+            const precioNum = parseInt(document.getElementById('pPrecioNum').value);
+            const rawPrecioAntes = document.getElementById('pPrecioAntes').value.trim();
+            const precioAntes = rawPrecioAntes !== "" ? parseInt(rawPrecioAntes) : null;
+            const stockNum = parseInt(document.getElementById('pStock').value) || 0;
+            const formattedPrice = '$' + precioNum.toLocaleString('es-CL');
+
+            const fotoVal = document.getElementById('pFoto').value.trim();
+            if (!fotoVal) {
+                alert("Por favor selecciona una foto principal desde tu computadora.");
+                return;
+            }
+
+            const varRows = document.querySelectorAll('.variant-row');
+            let opciones = [];
+            varRows.forEach(row => {
+                const name = row.querySelector('.var-name').value.trim();
+                const img = row.querySelector('.var-img').value.trim();
+                const stock = parseInt(row.querySelector('.var-stock').value) || 0;
+                const status = (stock > 0) ? 'disponible' : 'agotado';
+                if (name) opciones.push({ name, img, stock, status });
+            });
+
+            const productPayload = {
+                client_id: CLIENT_ID,
+                nombre: document.getElementById('pNombre').value.trim(),
+                categoria: document.getElementById('pCategoria').value,
+                precio: formattedPrice,
+                precio_num: precioNum,
+                precio_antes: precioAntes,
+                stock: stockNum,
+                foto: fotoVal,
+                foto_grande: document.getElementById('pFotoGrande').value.trim() || null,
+                cuidados: document.getElementById('pCuidados').value.trim(),
+                es_novedad: document.getElementById('pEsNovedad').value === 'true',
+                opciones: opciones,
+                estado: (stockNum > 0) ? 'disponible' : 'agotado'
+            };
+
+            let resultError = null;
+
+            if (editId) {
+                const { error } = await client.from('productos').update(productPayload).eq('id', editId);
+                resultError = error;
+            } else {
+                const { error } = await client.from('productos').insert([productPayload]);
+                resultError = error;
+            }
+
+            if (resultError) {
+                alert("Error al procesar: " + resultError.message);
+            } else {
+                alert(editId ? "¡Diseño modificado con éxito! 🤍" : "¡Diseño agregado al catálogo! 🤍");
+                resetFormToCreate();
+                loadInventory();
+            }
+        }
+
+        async function changeProductQty(id, currentStock, delta) {
+            const client = getSupabase();
+            const newStock = Math.max(0, currentStock + delta);
+            const newStatus = (newStock === 0) ? 'agotado' : 'disponible';
+            await client.from('productos').update({ stock: newStock, estado: newStatus }).eq('id', id);
+            loadInventory();
+        }
+
+        async function changeVarQty(productId, varIndex, delta) {
+            const client = getSupabase();
+            const { data: p, error } = await client.from('productos').select('opciones').eq('id', productId).single();
+            if (error || !p || !p.opciones) return;
+
+            let updatedOpciones = [...p.opciones];
+            if (updatedOpciones[varIndex]) {
+                const currentVarStock = updatedOpciones[varIndex].stock !== undefined ? updatedOpciones[varIndex].stock : 2;
+                const newVarStock = Math.max(0, currentVarStock + delta);
+                updatedOpciones[varIndex].stock = newVarStock;
+                updatedOpciones[varIndex].status = (newVarStock === 0) ? 'agotado' : 'disponible';
+                await client.from('productos').update({ opciones: updatedOpciones }).eq('id', productId);
+                loadInventory();
+            }
+        }
+
+        async function toggleStock(id, currentStatus) {
+            const client = getSupabase();
+            const nextStatus = (currentStatus === 'disponible') ? 'agotado' : 'disponible';
+            await client.from('productos').update({ estado: nextStatus }).eq('id', id);
+            loadInventory();
+        }
+
+        async function deleteProduct(id, name) {
+            const client = getSupabase();
+            if (confirm(`¿Estás seguro de eliminar "${name}" del catálogo?`)) {
+                await client.from('productos').delete().eq('id', id);
+                loadInventory();
+            }
+        }
+
+        if (sessionStorage.getItem('mb_admin_auth') === 'true') {
+            showDashboard();
+        }
+    </script>
+</body>
+</html>
