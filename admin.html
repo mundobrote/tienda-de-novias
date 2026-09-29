@@ -101,56 +101,6 @@
         }
         .btn-logout:hover { background: var(--danger-color); color: #fff; }
 
-        /* Panel de Gestión de Categorías */
-        .categories-config-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 20px rgba(180, 160, 150, 0.08);
-        }
-        .categories-config-card h4 {
-            font-size: 1.2rem;
-            color: var(--primary-rose);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .cat-add-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .cat-chips-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .cat-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #fdfbf9;
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-main);
-        }
-        .cat-chip-delete {
-            background: transparent;
-            border: none;
-            color: var(--danger-color);
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9rem;
-            padding: 0 2px;
-        }
-        .cat-chip-delete:hover { color: #800; }
-
         .form-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -172,7 +122,17 @@
             margin-bottom: 15px;
         }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+        .form-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        
+        .label-action-link {
+            color: var(--primary-rose);
+            font-size: 0.78rem;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 700;
+        }
+        .label-action-link:hover { color: var(--rose-hover); }
+
         .form-control {
             padding: 10px 14px;
             background: #fcfbfa;
@@ -347,7 +307,7 @@
         }
         .btn-delete:hover { background: var(--danger-color); color: #fff; }
 
-        /* Estilos del Modal de Recorte de Imagen */
+        /* Estilos generales para Modales */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -375,6 +335,29 @@
             margin-bottom: 15px;
             font-family: 'Cormorant Garamond', serif;
         }
+        
+        /* Modal de Categorías */
+        .cat-modal-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+            background: #fdfbf9;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .cat-modal-row input { flex: 1; border: none; background: transparent; font-size: 0.95rem; outline: none; color: var(--text-main); }
+        .cat-modal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        /* Estilos del Modal de Recorte de Imagen */
         .cropper-container-box {
             max-height: 380px;
             background: #faf7f5;
@@ -427,18 +410,6 @@
             <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
         </div>
 
-        <!-- Módulo de Configuración de Categorías -->
-        <div class="categories-config-card">
-            <h4>🏷️ Administrar Categorías del Catálogo</h4>
-            <div class="cat-add-row">
-                <input type="text" id="newCategoryInput" class="form-control" placeholder="Nueva categoría (ej: Vestidos de Gala)">
-                <button type="button" class="btn-submit" onclick="addNewCategory()" style="padding: 10px 18px; white-space: nowrap;">+ Añadir Categoría</button>
-            </div>
-            <div id="categoriesChipsContainer" class="cat-chips-container">
-                <!-- Se cargan dinámicamente -->
-            </div>
-        </div>
-
         <div id="formCardContainer" class="form-card">
             <h3 id="formTitle">✨ Agregar Nuevo Diseño / Vestido</h3>
             <form id="productForm" onsubmit="handleFormSubmit(event)">
@@ -451,7 +422,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Categoría *</label>
+                        <label>
+                            Categoría *
+                            <span class="label-action-link" onclick="openCategoriesModal()">✏️ Editar Categorías (Máx. 5)</span>
+                        </label>
                         <select id="pCategoria" class="form-control" required>
                             <!-- Se llena dinámicamente -->
                         </select>
@@ -537,6 +511,27 @@
         </div>
     </div>
 
+    <!-- MODAL DE GESTIÓN DE CATEGORÍAS -->
+    <div id="categoriesModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">🏷️ Administrar Categorías (Máximo 5)</div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Puedes editar los nombres de tus categorías existentes, eliminarlas o añadir nuevas.</p>
+            
+            <div id="modalCategoriesList">
+                <!-- Se llenan con inputs editables -->
+            </div>
+
+            <div id="addCategorySection" style="margin-top: 15px; margin-bottom: 5px;">
+                <button type="button" class="btn-add-var" onclick="modalAddNewCategoryRow()" style="width: 100%; padding: 8px;">+ Añadir Categoría</button>
+            </div>
+
+            <div class="cat-modal-actions">
+                <button type="button" class="btn-modal-action btn-cancel-crop" onclick="closeCategoriesModal()">Cancelar</button>
+                <button type="button" class="btn-modal-action btn-confirm-crop" onclick="saveCategoriesFromModal()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE CORTE Y EDICIÓN DE IMÁGENES -->
     <div id="cropModal" class="modal-overlay">
         <div class="modal-content">
@@ -603,7 +598,7 @@
         function showDashboard() {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
-            loadCategories();
+            loadCategoriesSelector();
             loadInventory();
         }
 
@@ -612,7 +607,7 @@
             location.reload();
         }
 
-        // --- SISTEMA DE GESTIÓN DE CATEGORÍAS LOCALSTORAGE ---
+        // --- SISTEMA DE GESTIÓN DE CATEGORÍAS (MÁXIMO 5) ---
         function getSavedCategories() {
             const stored = localStorage.getItem(`atelier_categories_${CLIENT_ID}`);
             if (stored) {
@@ -625,10 +620,8 @@
             localStorage.setItem(`atelier_categories_${CLIENT_ID}`, JSON.stringify(cats));
         }
 
-        function loadCategories() {
+        function loadCategoriesSelector() {
             const cats = getSavedCategories();
-            
-            // 1. Rellenar el selector del formulario
             const selectEl = document.getElementById('pCategoria');
             selectEl.innerHTML = '';
             cats.forEach(c => {
@@ -637,60 +630,107 @@
                 opt.textContent = c.name;
                 selectEl.appendChild(opt);
             });
+        }
 
-            // 2. Rellenar los chips visuales en el panel de administración
-            const container = document.getElementById('categoriesChipsContainer');
+        function openCategoriesModal() {
+            const cats = getSavedCategories();
+            renderModalCategoriesRows(cats);
+            document.getElementById('categoriesModal').style.display = 'flex';
+        }
+
+        function closeCategoriesModal() {
+            document.getElementById('categoriesModal').style.display = 'none';
+        }
+
+        function renderModalCategoriesRows(cats) {
+            const container = document.getElementById('modalCategoriesList');
             container.innerHTML = '';
-            cats.forEach(c => {
-                const chip = document.createElement('div');
-                chip.className = 'cat-chip';
-                chip.innerHTML = `
-                    <span>${c.name}</span>
-                    <button type="button" class="cat-chip-delete" onclick="deleteCategory('${c.id}')" title="Eliminar categoría">✕</button>
+            
+            cats.forEach((c, idx) => {
+                const row = document.createElement('div');
+                row.className = 'cat-modal-row';
+                row.innerHTML = `
+                    <input type="text" class="modal-cat-name" data-id="${c.id}" value="${c.name}" placeholder="Nombre de categoría" required>
+                    <button type="button" class="btn-remove-var" onclick="removeCategoryRow(this)">✕</button>
                 `;
-                container.appendChild(chip);
+                container.appendChild(row);
             });
+            updateAddCategoryButtonVisibility();
         }
 
-        function addNewCategory() {
-            const input = document.getElementById('newCategoryInput');
-            const val = input.value.trim();
-            if (!val) {
-                alert("Por favor escribe el nombre de la categoría.");
+        function modalAddNewCategoryRow() {
+            const container = document.getElementById('modalCategoriesList');
+            const currentRows = container.querySelectorAll('.cat-modal-row');
+            
+            if (currentRows.length >= 5) {
+                alert("Solo puedes tener un máximo de 5 categorías.");
                 return;
             }
 
-            // Generar un ID único amigable
-            const idVal = val.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]/g, "-")
-                .replace(/-+/g, "-");
-
-            let cats = getSavedCategories();
-            if (cats.some(c => c.id === idVal)) {
-                alert("Esta categoría ya existe.");
-                return;
-            }
-
-            cats.push({ id: idVal, name: val });
-            saveCategoriesToStorage(cats);
-            input.value = '';
-            loadCategories();
-            alert("¡Categoría añadida con éxito! ✨");
+            const row = document.createElement('div');
+            row.className = 'cat-modal-row';
+            row.innerHTML = `
+                <input type="text" class="modal-cat-name" data-id="" value="" placeholder="Nueva categoría" required>
+                <button type="button" class="btn-remove-var" onclick="removeCategoryRow(this)">✕</button>
+            `;
+            container.appendChild(row);
+            updateAddCategoryButtonVisibility();
         }
 
-        function deleteCategory(catId) {
-            let cats = getSavedCategories();
-            if (cats.length <= 1) {
-                alert("Debes mantener al menos una categoría en el catálogo.");
+        function removeCategoryRow(btn) {
+            const container = document.getElementById('modalCategoriesList');
+            const rows = container.querySelectorAll('.cat-modal-row');
+            if (rows.length <= 1) {
+                alert("Debes mantener al menos una categoría.");
+                return;
+            }
+            btn.parentElement.remove();
+            updateAddCategoryButtonVisibility();
+        }
+
+        function updateAddCategoryButtonVisibility() {
+            const container = document.getElementById('modalCategoriesList');
+            const rows = container.querySelectorAll('.cat-modal-row');
+            const addBtn = document.querySelector('#addCategorySection button');
+            if (rows.length >= 5) {
+                addBtn.style.display = 'none';
+            } else {
+                addBtn.style.display = 'block';
+            }
+        }
+
+        function saveCategoriesFromModal() {
+            const container = document.getElementById('modalCategoriesList');
+            const rowInputs = container.querySelectorAll('.modal-cat-name');
+            
+            let newCategories = [];
+            for (let input of rowInputs) {
+                const nameVal = input.value.trim();
+                if (!nameVal) {
+                    alert("Los nombres de las categorías no pueden estar vacíos.");
+                    return;
+                }
+                
+                let idVal = input.getAttribute('data-id');
+                if (!idVal) {
+                    idVal = nameVal.toLowerCase()
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                        .replace(/[^a-z0-9]/g, "-")
+                        .replace(/-+/g, "-") + "-" + Date.now().toString().slice(-4);
+                }
+                newCategories.push({ id: idVal, name: nameVal });
+            }
+
+            if (newCategories.length > 5) {
+                alert("El límite máximo es de 5 categorías.");
                 return;
             }
 
-            if (confirm("¿Estás segura de eliminar esta categoría?")) {
-                cats = cats.filter(c => c.id !== catId);
-                saveCategoriesToStorage(cats);
-                loadCategories();
-            }
+            saveCategoriesToStorage(newCategories);
+            loadCategoriesSelector();
+            loadInventory();
+            closeCategoriesModal();
+            alert("¡Categorías actualizadas con éxito! ✨");
         }
         // ----------------------------------------------------
 
@@ -811,7 +851,6 @@
                     return;
                 }
 
-                // Obtener nombres amigables de categorías guardadas para mostrarlas en la tabla
                 const cats = getSavedCategories();
                 const catMap = {};
                 cats.forEach(c => catMap[c.id] = c.name);
