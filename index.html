@@ -356,6 +356,43 @@
             return clientDb;
         }
 
+        // --- VERIFICACIÓN DE ESTADO DE SUSCRIPCIÓN ---
+        async function checkSubscriptionStatus() {
+            const db = getSupabase();
+            if (!db || !CLIENT_ID) return;
+
+            try {
+                const { data, error } = await db
+                    .from('suscripciones')
+                    .select('estado')
+                    .eq('client_id', CLIENT_ID)
+                    .single();
+
+                if (data && data.estado === 'inactive') {
+                    lockWebsiteDueToSubscription();
+                }
+            } catch (err) {
+                // Si la tabla no existe o no hay registros, continúa con normalidad
+            }
+        }
+
+        function lockWebsiteDueToSubscription() {
+            const overlay = document.createElement('div');
+            overlay.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(43, 43, 43, 0.95); backdrop-filter: blur(8px); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #fbf9f6; padding: 20px; font-family: 'Inter', sans-serif;">
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.8rem; color: #c5a059; margin-bottom: 15px; letter-spacing: 2px;">Servicio Temporalmente Suspendido</h2>
+                    <p style="font-size: 1.05rem; max-width: 600px; line-height: 1.6; color: #d1ccb8; margin-bottom: 30px; font-weight: 300;">
+                        Estimado cliente, esta plataforma se encuentra temporalmente inactiva por periodo de pruebas o actualización de suscripción de plataforma. Por favor, comuníquese con soporte técnico para restablecer el servicio.
+                    </p>
+                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #736e65; border-top: 1px solid #444; padding-top: 20px; width: 200px;">
+                        AXOPTEC Platform
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            throw new Error("Sitio bloqueado por suscripción inactiva.");
+        }
+
         function getSavedCategories() {
             if (!CLIENT_ID) return defaultCategories;
             const stored = localStorage.getItem(`atelier_categories_${CLIENT_ID}`);
@@ -401,6 +438,9 @@
                 setTimeout(loadStoreCatalog, 800);
                 return;
             }
+
+            // VERIFICAR ESTADO DE SUSCRIPCIÓN ANTES DE CARGAR
+            await checkSubscriptionStatus();
 
             renderCategoryFilters();
 
