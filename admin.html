@@ -236,6 +236,29 @@
         .price-sale { color: var(--success-color); font-weight: 700; }
         .price-before { color: var(--text-muted); font-size: 0.8rem; text-decoration: line-through; margin-left: 5px; }
 
+        /* Botón de información de seguridad de precio */
+        .info-price-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: var(--badge-gold-bg);
+            color: var(--gold-accent);
+            border: 1px solid rgba(197, 155, 39, 0.4);
+            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 6px;
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+        .info-price-btn:hover {
+            background: var(--gold-accent);
+            color: #fff;
+        }
+
         .stock-control {
             display: inline-flex;
             align-items: center;
@@ -432,7 +455,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Precio Numérico (CLP) * (Ej: 450000)</label>
+                        <label>
+                            Precio Numérico (CLP) * 
+                            <button type="button" class="info-price-btn" onclick="showSecurityInfo()" title="Información de Seguridad">i</button>
+                        </label>
                         <input type="number" id="pPrecioNum" class="form-control" placeholder="450000" required>
                     </div>
 
@@ -497,7 +523,10 @@
                         <th>Foto</th>
                         <th>Nombre</th>
                         <th>Categoría</th>
-                        <th>Precio</th>
+                        <th>
+                            Precio
+                            <button type="button" class="info-price-btn" onclick="showSecurityInfo()" title="Información de Seguridad">i</button>
+                        </th>
                         <th>Stock Unidades</th>
                         <th>Tallas / Opciones</th>
                         <th>Estado</th>
@@ -508,6 +537,17 @@
                     <tr><td colspan="8" style="text-align:center;">Cargando inventario...</td></tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- MODAL DE INFORMACIÓN DE SEGURIDAD -->
+    <div id="securityModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <div class="modal-header">🔒 Protección y Seguridad de Precios</div>
+            <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+                Los precios que registras se encuentran cifrados y almacenados de forma segura en nuestra base de datos oficial. Esto previene alteraciones externas, garantizando total transparencia e impidiendo intentos maliciosos de manipulación o estafas por parte de terceros.
+            </p>
+            <button type="button" class="btn-submit" onclick="closeSecurityInfo()" style="width: 100%;">Entendido</button>
         </div>
     </div>
 
@@ -605,6 +645,15 @@
         function logout() {
             sessionStorage.removeItem('mb_admin_auth');
             location.reload();
+        }
+
+        // --- MODAL DE INFORMACIÓN DE SEGURIDAD ---
+        function showSecurityInfo() {
+            document.getElementById('securityModal').style.display = 'flex';
+        }
+
+        function closeSecurityInfo() {
+            document.getElementById('securityModal').style.display = 'none';
         }
 
         // --- SISTEMA DE GESTIÓN DE CATEGORÍAS (MÁXIMO 5) ---
