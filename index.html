@@ -66,7 +66,7 @@
             color: var(--accent-gold);
         }
 
-        /* Sección Hero / Portada Principal con Video de Fondo */
+        /* Sección Hero / Portada Principal con Carrusel Dinámico de 5 Fotos */
         .hero {
             position: relative;
             height: 80vh;
@@ -77,19 +77,24 @@
             color: var(--white);
             padding: 0 20px;
             overflow: hidden;
+            background-color: #2b2b2b;
         }
 
-        .hero-video-bg {
+        .hero-slide {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            transform: translate(-50%, -50%);
-            object-fit: cover;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
             z-index: 1;
+        }
+
+        .hero-slide.active-slide {
+            opacity: 1;
         }
 
         .hero-overlay {
@@ -319,12 +324,10 @@
         </nav>
     </header>
 
-    <!-- Portada Principal con Video de Fondo -->
-    <section class="hero">
-        <video autoplay muted loop playsinline preload="auto" class="hero-video-bg">
-            <source src="foto/videofondo.mp4" type="video/mp4">
-            Tu navegador no soporta videos HTML5.
-        </video>
+    <!-- Portada Principal con Carrusel Dinámico conectado a Supabase -->
+    <section class="hero" id="heroSliderContainer">
+        <!-- Slide por defecto mientras conecta a Supabase -->
+        <div class="hero-slide active-slide" style="background-image: url('https://images.unsplash.com/photo-1594552072238-b8a3272be6cc?w=1600&auto=format&fit=crop&q=80');"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>Magia y Elegancia en tu Gran Día</h1>
@@ -387,7 +390,7 @@
             { id: "civil", name: "💍 Vestidos de Matrimonio Civil" },
             { id: "velos", name: "✨ Velos y Tocados" },
             { id: "zapatos", name: "👠 Zapatos y Complementos" },
-            { id: "joyeria", name: "💎 Joyería Nupcial" }
+            { id: "joyeria", name: "💎 Jewellery Nupcial" }
         ];
 
         function getSavedCategories() {
@@ -397,6 +400,38 @@
                 try { return JSON.parse(stored); } catch(e) {}
             }
             return defaultCategories;
+        }
+
+        // --- CARGAR FOTOS DE PORTADA DINÁMICAS DESDE SUPABASE ---
+        async function loadDynamicHeroSlider() {
+            try {
+                const { data } = await mbDb.from('clients_config').select('hero_photos').eq('client_id', CLIENT_ID).single();
+                const heroSection = document.getElementById('heroSliderContainer');
+                
+                if (data && data.hero_photos && Array.isArray(data.hero_photos) && data.hero_photos.length > 0) {
+                    const contentHtml = heroSection.querySelector('.hero-content').outerHTML;
+                    const overlayHtml = heroSection.querySelector('.hero-overlay').outerHTML;
+                    
+                    let slidesHtml = data.hero_photos.map((url, idx) => `
+                        <div class="hero-slide ${idx === 0 ? 'active-slide' : ''}" style="background-image: url('${url}');"></div>
+                    `).join('');
+
+                    heroSection.innerHTML = slidesHtml + overlayHtml + contentHtml;
+                }
+
+                // Iniciar carrusel automático de fotos
+                let slides = document.querySelectorAll(".hero-slide");
+                let currentSlide = 0;
+                if (slides.length > 1) {
+                    setInterval(() => {
+                        slides[currentSlide].classList.remove("active-slide");
+                        currentSlide = (currentSlide + 1) % slides.length;
+                        slides[currentSlide].classList.add("active-slide");
+                    }, 4000);
+                }
+            } catch (e) {
+                console.log("Usando portada predeterminada.");
+            }
         }
 
         // ==========================================
@@ -521,7 +556,8 @@
             }).join('');
         }
 
-        // Ejecutar validación de estatus comercial y carga de productos
+        // Ejecutar funciones de inicialización
+        loadDynamicHeroSlider();
         checkClientStatusSupabase();
         fetchProductsFromSupabase();
     </script>
