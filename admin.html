@@ -82,7 +82,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid var(--border-color);
         }
@@ -100,6 +100,40 @@
             transition: all 0.3s;
         }
         .btn-logout:hover { background: var(--danger-color); color: #fff; }
+
+        /* SISTEMA DE PESTAÑAS (SECCIONES) */
+        .panel-nav-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { color: var(--primary-rose); background: var(--rose-light); }
+        .tab-btn.active-tab {
+            background: var(--primary-rose);
+            color: white;
+            box-shadow: 0 4px 12px rgba(212, 163, 115, 0.3);
+        }
+
+        .panel-section { display: none; }
+        .panel-section.active-section {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         .form-card {
             background: var(--card-bg);
@@ -424,153 +458,164 @@
             <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
         </div>
 
-        <!-- SECCIÓN NUEVA: CONFIGURACIÓN DE FOTOS DE PORTADA (CARRUSEL) -->
-        <div class="form-card">
-            <h3>🖼️ Personalizar 5 Fotos de Portada (Carrusel)</h3>
-            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Sube o actualiza las 5 imágenes que rotarán automáticamente en la portada principal de tu tienda.</p>
-            <form id="heroConfigForm" onsubmit="saveHeroConfig(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Foto Portada 1 *</label>
-                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero1', 'heroFoto1')">
-                        <input type="hidden" id="heroFoto1">
-                        <img id="previewHero1" class="preview-img" alt="Hero 1">
-                    </div>
-                    <div class="form-group">
-                        <label>Foto Portada 2 *</label>
-                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero2', 'heroFoto2')">
-                        <input type="hidden" id="heroFoto2">
-                        <img id="previewHero2" class="preview-img" alt="Hero 2">
-                    </div>
-                    <div class="form-group">
-                        <label>Foto Portada 3 *</label>
-                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero3', 'heroFoto3')">
-                        <input type="hidden" id="heroFoto3">
-                        <img id="previewHero3" class="preview-img" alt="Hero 3">
-                    </div>
-                    <div class="form-group">
-                        <label>Foto Portada 4 *</label>
-                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero4', 'heroFoto4')">
-                        <input type="hidden" id="heroFoto4">
-                        <img id="previewHero4" class="preview-img" alt="Hero 4">
-                    </div>
-                    <div class="form-group">
-                        <label>Foto Portada 5 *</label>
-                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero5', 'heroFoto5')">
-                        <input type="hidden" id="heroFoto5">
-                        <img id="previewHero5" class="preview-img" alt="Hero 5">
-                    </div>
-                </div>
-                <button type="submit" class="btn-submit" style="margin-top: 10px;">💾 Guardar Fotos de Portada</button>
-            </form>
+        <!-- BOTONES DE SECCIÓN / PESTAÑAS -->
+        <div class="panel-nav-tabs">
+            <button type="button" class="tab-btn active-tab" onclick="switchSection('personalizar')" id="tabPersonalizar">🖼️ 1. Personalizar Sitio</button>
+            <button type="button" class="tab-btn" onclick="switchSection('inventario')" id="tabInventario">👗 2. Inventario</button>
         </div>
 
-        <div id="formCardContainer" class="form-card">
-            <h3 id="formTitle">✨ Agregar Nuevo Diseño / Vestido</h3>
-            <form id="productForm" onsubmit="handleFormSubmit(event)">
-                <input type="hidden" id="editProductId" value="">
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nombre del Diseño / Vestido *</label>
-                        <input type="text" id="pNombre" class="form-control" placeholder="Ej: Vestido Alta Costura Seraphina" required>
+        <!-- SECCIÓN 1: PERSONALIZAR SITIO (FOTOS DE PORTADA) -->
+        <div id="sectionPersonalizar" class="panel-section active-section">
+            <div class="form-card">
+                <h3>🖼️ Personalizar 5 Fotos de Portada (Carrusel)</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Sube o actualiza las 5 imágenes que rotarán automáticamente en la portada principal de tu tienda.</p>
+                <form id="heroConfigForm" onsubmit="saveHeroConfig(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Foto Portada 1 *</label>
+                            <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero1', 'heroFoto1')">
+                            <input type="hidden" id="heroFoto1">
+                            <img id="previewHero1" class="preview-img" alt="Hero 1">
+                        </div>
+                        <div class="form-group">
+                            <label>Foto Portada 2 *</label>
+                            <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero2', 'heroFoto2')">
+                            <input type="hidden" id="heroFoto2">
+                            <img id="previewHero2" class="preview-img" alt="Hero 2">
+                        </div>
+                        <div class="form-group">
+                            <label>Foto Portada 3 *</label>
+                            <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero3', 'heroFoto3')">
+                            <input type="hidden" id="heroFoto3">
+                            <img id="previewHero3" class="preview-img" alt="Hero 3">
+                        </div>
+                        <div class="form-group">
+                            <label>Foto Portada 4 *</label>
+                            <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero4', 'heroFoto4')">
+                            <input type="hidden" id="heroFoto4">
+                            <img id="previewHero4" class="preview-img" alt="Hero 4">
+                        </div>
+                        <div class="form-group">
+                            <label>Foto Portada 5 *</label>
+                            <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero5', 'heroFoto5')">
+                            <input type="hidden" id="heroFoto5">
+                            <img id="previewHero5" class="preview-img" alt="Hero 5">
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>
-                            Categoría *
-                            <span class="label-action-link" onclick="openCategoriesModal()">✏️ Editar Categorías (Máx. 5)</span>
-                        </label>
-                        <select id="pCategoria" class="form-control" required></select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            Precio Numérico (CLP) * 
-                            <button type="button" class="info-price-btn" onclick="showSecurityInfo()" title="Información de Seguridad">i</button>
-                        </label>
-                        <input type="number" id="pPrecioNum" class="form-control" placeholder="450000" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Precio Antes / Lista (Opcional)</label>
-                        <input type="number" id="pPrecioAntes" class="form-control" placeholder="Ej: 520000">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Stock / Disponibilidad en Tienda *</label>
-                        <input type="number" id="pStock" class="form-control" value="2" min="0" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Foto Principal (Catálogo) *</label>
-                        <input type="file" id="pFotoFile" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewMain', 'pFoto')">
-                        <input type="hidden" id="pFoto" required>
-                        <img id="previewMain" class="preview-img" alt="Vista previa">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Foto de Detalle o Espalda (Opcional)</label>
-                        <input type="file" id="pFotoGrandeFile" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewGrande', 'pFotoGrande')">
-                        <input type="hidden" id="pFotoGrande">
-                        <img id="previewGrande" class="preview-img" alt="Vista previa grande">
-                    </div>
-
-                    <div class="form-group">
-                        <label>¿Es Destacado / Novedad?</label>
-                        <select id="pEsNovedad" class="form-control">
-                            <option value="false">No</option>
-                            <option value="true">Sí (Mostrar en Inicio)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="variants-box">
-                    <h4>
-                        🎨 Tallas / Variantes Disponibles (Opcional)
-                        <button type="button" class="btn-add-var" onclick="addVariantRow()">+ Agregar Talla</button>
-                    </h4>
-                    <div id="variantsContainer"></div>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label>Detalles del Diseño (Silueta, Tejido, Ajustes)</label>
-                    <textarea id="pCuidados" class="form-control" placeholder="✨ Silueta: ...&#10;🧵 Tejido / Encaje: ...&#10;📏 Ajustes incluidos: ..."></textarea>
-                </div>
-
-                <div class="btn-submit-group">
-                    <button type="submit" id="btnSubmitForm" class="btn-submit">💾 Guardar Diseño</button>
-                    <button type="button" id="btnCancelEdit" class="btn-cancel-edit" onclick="resetFormToCreate()">Cancelar Edición</button>
-                </div>
-            </form>
+                    <button type="submit" class="btn-submit" style="margin-top: 10px;">💾 Guardar Fotos de Portada</button>
+                </form>
+            </div>
         </div>
 
-        <div class="table-responsive">
-            <h3 style="color:var(--primary-rose); margin-bottom:15px;">📋 Inventario (<span id="totalCount">0</span>)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>
-                            Precio
-                            <button type="button" class="info-price-btn" onclick="showSecurityInfo()" title="Información de Seguridad">i</button>
-                        </th>
-                        <th>Stock Unidades</th>
-                        <th>Tallas / Opciones</th>
-                        <th>Estado</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="inventoryTableBody">
-                    <tr><td colspan="8" style="text-align:center;">Cargando inventario...</td></tr>
-                </tbody>
-            </table>
+        <!-- SECCIÓN 2: INVENTARIO Y CATÁLOGO -->
+        <div id="sectionInventario" class="panel-section">
+            <div id="formCardContainer" class="form-card">
+                <h3 id="formTitle">✨ Agregar Nuevo Diseño / Vestido</h3>
+                <form id="productForm" onsubmit="handleFormSubmit(event)">
+                    <input type="hidden" id="editProductId" value="">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombre del Diseño / Vestido *</label>
+                            <input type="text" id="pNombre" class="form-control" placeholder="Ej: Vestido Alta Costura Seraphina" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Categoría *
+                                <span class="label-action-link" onclick="openCategoriesModal()">✏️ Editar Categorías (Máx. 5)</span>
+                            </label>
+                            <select id="pCategoria" class="form-control" required></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Precio Numérico (CLP) * 
+                                <button type="button" class="info-price-btn" onclick="showSecurityInfo()" title="Información de Seguridad">i</button>
+                            </label>
+                            <input type="number" id="pPrecioNum" class="form-control" placeholder="450000" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Precio Antes / Lista (Opcional)</label>
+                            <input type="number" id="pPrecioAntes" class="form-control" placeholder="Ej: 520000">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Stock / Disponibilidad en Tienda *</label>
+                            <input type="number" id="pStock" class="form-control" value="2" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto Principal (Catálogo) *</label>
+                            <input type="file" id="pFotoFile" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewMain', 'pFoto')">
+                            <input type="hidden" id="pFoto" required>
+                            <img id="previewMain" class="preview-img" alt="Vista previa">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto de Detalle o Espalda (Opcional)</label>
+                            <input type="file" id="pFotoGrandeFile" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewGrande', 'pFotoGrande')">
+                            <input type="hidden" id="pFotoGrande">
+                            <img id="previewGrande" class="preview-img" alt="Vista previa grande">
+                        </div>
+
+                        <div class="form-group">
+                            <label>¿Es Destacado / Novedad?</label>
+                            <select id="pEsNovedad" class="form-control">
+                                <option value="false">No</option>
+                                <option value="true">Sí (Mostrar en Inicio)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="variants-box">
+                        <h4>
+                            🎨 Tallas / Variantes Disponibles (Opcional)
+                            <button type="button" class="btn-add-var" onclick="addVariantRow()">+ Agregar Talla</button>
+                        </h4>
+                        <div id="variantsContainer"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Detalles del Diseño (Silueta, Tejido, Ajustes)</label>
+                        <textarea id="pCuidados" class="form-control" placeholder="✨ Silueta: ...&#10;🧵 Tejido / Encaje: ...&#10;📏 Ajustes incluidos: ..."></textarea>
+                    </div>
+
+                    <div class="btn-submit-group">
+                        <button type="submit" id="btnSubmitForm" class="btn-submit">💾 Guardar Diseño</button>
+                        <button type="button" id="btnCancelEdit" class="btn-cancel-edit" onclick="resetFormToCreate()">Cancelar Edición</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <h3 style="color:var(--primary-rose); margin-bottom:15px;">📋 Inventario (<span id="totalCount">0</span>)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>
+                                Precio
+                                <button type="button" class="info-price-btn" onclick="showSecurityInfo()" title="Información de Seguridad">i</button>
+                            </th>
+                            <th>Stock Unidades</th>
+                            <th>Tallas / Opciones</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <tr><td colspan="8" style="text-align:center;">Cargando inventario...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL DE INFORMACIÓN DE SEGURIDAD -->
+    <!-- MODALES -->
     <div id="securityModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 450px; text-align: center;">
             <div class="modal-header">🔒 Protección y Seguridad de Precios</div>
@@ -581,18 +626,14 @@
         </div>
     </div>
 
-    <!-- MODAL DE GESTIÓN DE CATEGORÍAS -->
     <div id="categoriesModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">🏷️ Administrar Categorías (Máximo 5)</div>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Puedes editar los nombres de tus categorías existentes, eliminarlas o añadir nuevas.</p>
-            
             <div id="modalCategoriesList"></div>
-
             <div id="addCategorySection" style="margin-top: 15px; margin-bottom: 5px;">
                 <button type="button" class="btn-add-var" onclick="modalAddNewCategoryRow()" style="width: 100%; padding: 8px;">+ Añadir Categoría</button>
             </div>
-
             <div class="cat-modal-actions">
                 <button type="button" class="btn-modal-action btn-cancel-crop" onclick="closeCategoriesModal()">Cancelar</button>
                 <button type="button" class="btn-modal-action btn-confirm-crop" onclick="saveCategoriesFromModal()">Guardar Cambios</button>
@@ -600,7 +641,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE CORTE Y EDICIÓN DE IMÁGENES -->
     <div id="cropModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">✂️ Ajustar y Recortar Imagen</div>
@@ -641,7 +681,7 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const CLIENT_ID = urlParams.get('client') || 'plantas';
-        document.getElementById('dashMainTitle').innerHTML = `🕊️ Gestión  <span class="badge-client">Cliente: ${CLIENT_ID}</span>`;
+        document.getElementById('dashMainTitle').innerHTML = `🕊️ Auro Novias <span class="badge-client">Cliente: ${CLIENT_ID}</span>`;
 
         function getSupabase() {
             if (!mbAdminDb && window.supabase) {
@@ -675,14 +715,26 @@
             location.reload();
         }
 
+        // --- SISTEMA DE PESTAÑAS (SECCIONES) ---
+        function switchSection(sectionName) {
+            document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active-section'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+
+            if (sectionName === 'personalizar') {
+                document.getElementById('sectionPersonalizar').classList.add('active-section');
+                document.getElementById('tabPersonalizar').classList.add('active-tab');
+            } else {
+                document.getElementById('sectionInventario').classList.add('active-section');
+                document.getElementById('tabInventario').classList.add('active-tab');
+            }
+        }
+
         function showSecurityInfo() { document.getElementById('securityModal').style.display = 'flex'; }
         function closeSecurityInfo() { document.getElementById('securityModal').style.display = 'none'; }
 
         function getSavedCategories() {
             const stored = localStorage.getItem(`atelier_categories_${CLIENT_ID}`);
-            if (stored) {
-                try { return JSON.parse(stored); } catch(e) {}
-            }
+            if (stored) { try { return JSON.parse(stored); } catch(e) {} }
             return defaultCategories;
         }
 
@@ -816,7 +868,6 @@
             cropperInstance = null;
         }
 
-        // --- GUARDAR Y CARGAR CONFIGURACIÓN DE FOTOS DE PORTADA EN SUPABASE ---
         async function saveHeroConfig(e) {
             e.preventDefault();
             const client = getSupabase();
@@ -860,7 +911,6 @@
                 });
             }
         }
-        // -------------------------------------------------------------------
 
         function addVariantRow(name = '', img = '', stock = 2) {
             const container = document.getElementById('variantsContainer');
