@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Cropper.js (Librería para editar y recortar imágenes) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -454,18 +453,32 @@
 
     <div id="dashboardSection" class="dashboard-container">
         <div class="dash-header">
-            <h1 id="dashMainTitle">🕊️ Gestión de Colección Nupcial</h1>
+            <h1 id="dashMainTitle">🕊️ Auro Novias Panel</h1>
             <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
         </div>
 
-        <!-- BOTONES DE SECCIÓN / PESTAÑAS -->
         <div class="panel-nav-tabs">
-            <button type="button" class="tab-btn active-tab" onclick="switchSection('personalizar')" id="tabPersonalizar">🖼️️ 1. Personalizar Sitio</button>
+            <button type="button" class="tab-btn active-tab" onclick="switchSection('personalizar')" id="tabPersonalizar">🖼️ 1. Personalizar Sitio</button>
             <button type="button" class="tab-btn" onclick="switchSection('inventario')" id="tabInventario">👗 2. Inventario</button>
         </div>
 
-        <!-- SECCIÓN 1: PERSONALIZAR SITIO (FOTO MAGIA Y ELEGANCIA + CARRUSEL DE 5 FOTOS) -->
         <div id="sectionPersonalizar" class="panel-section active-section">
+            <div class="form-card">
+                <h3>✍️ Textos de Bienvenida</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Edita el título principal y el subtítulo de tu portada.</p>
+                <form id="heroTextsForm" onsubmit="saveHeroTextsConfig(event)">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Título Principal de Bienvenida *</label>
+                        <input type="text" id="heroTitleText" class="form-control" placeholder="Ej: Magia y Elegancia en tu Gran Día" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Subtítulo o Descripción *</label>
+                        <textarea id="heroSubtitleText" class="form-control" placeholder="Ej: Descubre nuestra exclusiva selección..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">💾 Guardar Textos</button>
+                </form>
+            </div>
+
             <div class="form-card">
                 <h3>✨ Foto de Bienvenida ("Magia y Elegancia")</h3>
                 <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Sube la foto especial oscura para que resalte el texto de bienvenida principal.</p>
@@ -521,7 +534,6 @@
             </div>
         </div>
 
-        <!-- SECCIÓN 2: INVENTARIO Y CATÁLOGO -->
         <div id="sectionInventario" class="panel-section">
             <div id="formCardContainer" class="form-card">
                 <h3 id="formTitle">✨ Agregar Nuevo Diseño / Vestido</h3>
@@ -544,8 +556,7 @@
 
                         <div class="form-group">
                             <label>
-                                Precio Numérico (CLP) * 
-                                <button type="button" class="info-price-btn" onclick="showSecurityInfo()" title="Información de Seguridad">i</button>
+                                Precio Numérico (CLP) * <button type="button" class="info-price-btn" onclick="showSecurityInfo()" title="Información de Seguridad">i</button>
                             </label>
                             <input type="number" id="pPrecioNum" class="form-control" placeholder="450000" required>
                         </div>
@@ -629,7 +640,6 @@
         </div>
     </div>
 
-    <!-- MODALES -->
     <div id="securityModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 450px; text-align: center;">
             <div class="modal-header">🔒 Protección y Seguridad de Precios</div>
@@ -881,6 +891,15 @@
             cropperInstance = null;
         }
 
+        async function saveHeroTextsConfig(e) {
+            e.preventDefault();
+            const client = getSupabase();
+            const titleVal = document.getElementById('heroTitleText').value.trim();
+            const subtitleVal = document.getElementById('heroSubtitleText').value.trim();
+            const { error } = await client.from('clients_config').upsert({ client_id: CLIENT_ID, hero_title: titleVal, hero_subtitle: subtitleVal }, { onConflict: 'client_id' });
+            if (error) alert("Error: " + error.message); else alert("¡Textos de bienvenida guardados con éxito! ✨");
+        }
+
         async function saveWelcomeHeroConfig(e) {
             e.preventDefault();
             const client = getSupabase();
@@ -907,8 +926,10 @@
 
         async function loadHeroConfig() {
             const client = getSupabase();
-            const { data } = await client.from('clients_config').select('welcome_photo, hero_photos').eq('client_id', CLIENT_ID).single();
+            const { data } = await client.from('clients_config').select('hero_title, hero_subtitle, welcome_photo, hero_photos').eq('client_id', CLIENT_ID).single();
             if (data) {
+                if (data.hero_title) document.getElementById('heroTitleText').value = data.hero_title;
+                if (data.hero_subtitle) document.getElementById('heroSubtitleText').value = data.hero_subtitle;
                 if (data.welcome_photo) {
                     document.getElementById('welcomeFoto').value = data.welcome_photo;
                     const prevW = document.getElementById('previewWelcome');
