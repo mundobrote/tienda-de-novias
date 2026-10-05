@@ -33,7 +33,7 @@
             font-weight: 400;
         }
 
-        /* Barra Superior / Header */
+        /* Barra Superior / Header (Sin siluetas) */
         header {
             display: flex;
             justify-content: space-between;
@@ -47,7 +47,7 @@
         }
 
         .brand-logo img {
-            height: 60px; /* Ajusta la altura de tu logotipo según prefieras */
+            height: 60px;
             width: auto;
             display: block;
         }
@@ -66,7 +66,7 @@
             color: var(--accent-gold);
         }
 
-        /* Sección Hero / Portada Principal con Carrusel Dinámico de 5 Fotos */
+        /* 1. Sección de Bienvenida Superior con Foto Oscura para resaltar título */
         .hero {
             position: relative;
             height: 80vh;
@@ -77,24 +77,9 @@
             color: var(--white);
             padding: 0 20px;
             overflow: hidden;
-            background-color: #2b2b2b;
-        }
-
-        .hero-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
             background-size: cover;
             background-position: center;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            z-index: 1;
-        }
-
-        .hero-slide.active-slide {
-            opacity: 1;
+            background-color: #1a1a1a;
         }
 
         .hero-overlay {
@@ -103,13 +88,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.35); /* Capa oscura para legibilidad del texto */
-            z-index: 2;
+            background: rgba(0, 0, 0, 0.55); /* Filtro más oscuro para que resalte el texto blanco */
+            z-index: 1;
         }
 
         .hero-content {
             position: relative;
-            z-index: 3;
+            z-index: 2;
             max-width: 800px;
         }
 
@@ -143,6 +128,32 @@
         .btn-primary:hover {
             background-color: var(--accent-gold);
             color: var(--white);
+        }
+
+        /* 2. Sección de Carrusel Intermedio (entre bienvenida y colección) con colores originales */
+        .hero-carousel-section {
+            position: relative;
+            height: 60vh;
+            width: 100%;
+            overflow: hidden;
+            background-color: #2b2b2b;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 1;
+        }
+
+        .hero-slide.active-slide {
+            opacity: 1;
         }
 
         /* Filtros de Categorías Dinámicas */
@@ -311,29 +322,32 @@
 </head>
 <body>
 
-    <!-- Cabecera boutique con Logotipo -->
+    <!-- Cabecera boutique con Logotipo (Sin siluetas) -->
     <header>
         <a href="#" class="brand-logo">
             <img src="foto/logo.png" alt="Auro Novias Logo">
         </a>
         <nav>
             <a href="#coleccion">Colección</a>
-            <a href="#siluetas">Siluetas</a>
             <a href="#experiencia">Experiencia</a>
             <a href="#contacto">Agenda tu Cita</a>
         </nav>
     </header>
 
-    <!-- Portada Principal con Carrusel Dinámico conectado a Supabase -->
-    <section class="hero" id="heroSliderContainer">
-        <!-- Slide por defecto mientras conecta a Supabase -->
-        <div class="hero-slide active-slide" style="background-image: url('https://images.unsplash.com/photo-1594552072238-b8a3272be6cc?w=1600&auto=format&fit=crop&q=80');"></div>
+    <!-- 1. Sección de Bienvenida Principal (Foto Oscura / Especial) -->
+    <section class="hero" id="heroWelcomeSection" style="background-image: url('https://images.unsplash.com/photo-1594552072238-b8a3272be6cc?w=1600&auto=format&fit=crop&q=80');">
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>Magia y Elegancia en tu Gran Día</h1>
             <p>Descubre nuestra exclusiva selección de vestidos de alta costura inspirados en la sofisticación moderna.</p>
             <a href="#coleccion" class="btn-primary">Ver Colección Online</a>
         </div>
+    </section>
+
+    <!-- 2. Sección del Carrusel Intermedio (Entre bienvenida y colección) -->
+    <section class="hero-carousel-section" id="heroCarouselContainer">
+        <!-- Slides originales cargados desde Supabase -->
+        <div class="hero-slide active-slide" style="background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&auto=format&fit=crop&q=80');"></div>
     </section>
 
     <!-- Catálogo de Vestidos Dinámico conectado estrictamente al cliente -->
@@ -384,13 +398,13 @@
         let allProducts = [];
         let currentFilter = 'todos';
 
-        // Categorías por defecto del Atelier
+        // Categorías por defecto
         let defaultCategories = [
             { id: "alta-costura", name: "👑 Alta Costura y Princesa" },
             { id: "civil", name: "💍 Vestidos de Matrimonio Civil" },
             { id: "velos", name: "✨ Velos y Tocados" },
             { id: "zapatos", name: "👠 Zapatos y Complementos" },
-            { id: "joyeria", name: "💎 Jewellery Nupcial" }
+            { id: "joyeria", name: "💎 Joyería Nupcial" }
         ];
 
         function getSavedCategories() {
@@ -402,24 +416,28 @@
             return defaultCategories;
         }
 
-        // --- CARGAR FOTOS DE PORTADA DINÁMICAS DESDE SUPABASE ---
-        async function loadDynamicHeroSlider() {
+        // --- CARGAR FOTO OSCURA DE BIENVENIDA Y CARRUSEL DESDE SUPABASE ---
+        async function loadDynamicSiteDesign() {
             try {
-                const { data } = await mbDb.from('clients_config').select('hero_photos').eq('client_id', CLIENT_ID).single();
-                const heroSection = document.getElementById('heroSliderContainer');
+                const { data } = await mbDb.from('clients_config').select('welcome_photo, hero_photos').eq('client_id', CLIENT_ID).single();
                 
-                if (data && data.hero_photos && Array.isArray(data.hero_photos) && data.hero_photos.length > 0) {
-                    const contentHtml = heroSection.querySelector('.hero-content').outerHTML;
-                    const overlayHtml = heroSection.querySelector('.hero-overlay').outerHTML;
-                    
-                    let slidesHtml = data.hero_photos.map((url, idx) => `
-                        <div class="hero-slide ${idx === 0 ? 'active-slide' : ''}" style="background-image: url('${url}');"></div>
-                    `).join('');
+                if (data) {
+                    // Cargar foto oscura de bienvenida
+                    if (data.welcome_photo) {
+                        document.getElementById('heroWelcomeSection').style.backgroundImage = `url('${data.welcome_photo}')`;
+                    }
 
-                    heroSection.innerHTML = slidesHtml + overlayHtml + contentHtml;
+                    // Cargar 5 fotos del carrusel intermedio
+                    if (data.hero_photos && Array.isArray(data.hero_photos) && data.hero_photos.length > 0) {
+                        const carouselContainer = document.getElementById('heroCarouselContainer');
+                        let slidesHtml = data.hero_photos.map((url, idx) => `
+                            <div class="hero-slide ${idx === 0 ? 'active-slide' : ''}" style="background-image: url('${url}');"></div>
+                        `).join('');
+                        carouselContainer.innerHTML = slidesHtml;
+                    }
                 }
 
-                // Iniciar carrusel automático de fotos
+                // Iniciar rotación automática del carrusel intermedio
                 let slides = document.querySelectorAll(".hero-slide");
                 let currentSlide = 0;
                 if (slides.length > 1) {
@@ -430,7 +448,7 @@
                     }, 4000);
                 }
             } catch (e) {
-                console.log("Usando portada predeterminada.");
+                console.log("Usando diseño predeterminado.");
             }
         }
 
@@ -557,7 +575,7 @@
         }
 
         // Ejecutar funciones de inicialización
-        loadDynamicHeroSlider();
+        loadDynamicSiteDesign();
         checkClientStatusSupabase();
         fetchProductsFromSupabase();
     </script>
