@@ -337,6 +337,17 @@
         const urlParams = new URLSearchParams(window.location.search);
         const CLIENT_ID = urlParams.get('client');
 
+        // --- VALIDACIÓN DE SEGURIDAD ESTRICTA (EVITA DATOS CRUZADOS) ---
+        if (!CLIENT_ID) {
+            document.getElementById('catalogGrid').innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; color: #bc4749; padding: 40px;">
+                    <h3>⚠️ Enlace incompleto o no autorizado</h3>
+                    <p style="margin-top: 10px; color: var(--text-muted);">Por favor accede utilizando el enlace personalizado asignado a tu tienda (ej: index.html?client=tu_id).</p>
+                </div>`;
+            throw new Error("Falta el parámetro client en la URL para aislar los datos.");
+        }
+        // -------------------------------------------------------------
+
         let allProducts = [];
         let currentFilter = 'todos';
 
@@ -423,15 +434,6 @@
 
         async function fetchProductsFromSupabase() {
             const grid = document.getElementById('catalogGrid');
-
-            if (!CLIENT_ID) {
-                grid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; color: #bc4749; padding: 40px;">
-                        <h3>⚠️ Enlace incompleto</h3>
-                        <p style="margin-top: 10px; color: var(--text-muted);">Por favor accede utilizando el enlace personalizado de tu tienda (ej: index.html?client=tu_id).</p>
-                    </div>`;
-                return;
-            }
 
             try {
                 const { data, error } = await mbDb
