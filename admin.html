@@ -464,6 +464,38 @@
 
         <div id="sectionPersonalizar" class="panel-section active-section">
             <div class="form-card">
+                <h3>💬 Configuración de WhatsApp y Contacto</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Configura tu número de WhatsApp y el mensaje que recibirás cuando tus clientas reserven una cita.</p>
+                <form id="whatsappConfigForm" onsubmit="saveWhatsappConfig(event)">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Número de WhatsApp (con código de país, ej: 56912345678) *</label>
+                        <input type="text" id="whatsappNumber" class="form-control" placeholder="56912345678" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Mensaje Predeterminado para Citas y Consultas *</label>
+                        <textarea id="whatsappMessage" class="form-control" placeholder="Hola, me gustaría agendar una cita en Auro Novias..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">💾 Guardar WhatsApp</button>
+                </form>
+            </div>
+
+            <div class="form-card">
+                <h3>📍 Configuración de Sección Experiencia y Dirección</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Edita el mensaje institucional y la dirección física del taller o tienda.</p>
+                <form id="experienceConfigForm" onsubmit="saveExperienceConfig(event)">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Dirección del Atelier / Tienda *</label>
+                        <input type="text" id="atelierAddress" class="form-control" placeholder="Ej: Alonso de Córdova 4200, Vitacura, Santiago" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Texto de la Sección Experiencia *</label>
+                        <textarea id="experienceText" class="form-control" style="min-height: 120px;" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">💾 Guardar Experiencia y Dirección</button>
+                </form>
+            </div>
+
+            <div class="form-card">
                 <h3>✍️ Textos de Bienvenida</h3>
                 <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Edita el título principal y el subtítulo de tu portada.</p>
                 <form id="heroTextsForm" onsubmit="saveHeroTextsConfig(event)">
@@ -549,7 +581,7 @@
                         <div class="form-group">
                             <label>
                                 Categoría *
-                                <span class="label-action-link" onclick="openCategoriesModal()">✏️ Editar Categorías (Máx. 5)</span>
+                                <span class="label-action-link" onclick="openCategoriesModal()">✏️️ Editar Categorías (Máx. 5)</span>
                             </label>
                             <select id="pCategoria" class="form-control" required></select>
                         </div>
@@ -640,6 +672,7 @@
         </div>
     </div>
 
+    <!-- MODALES -->
     <div id="securityModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 450px; text-align: center;">
             <div class="modal-header">🔒 Protección y Seguridad de Precios</div>
@@ -891,6 +924,32 @@
             cropperInstance = null;
         }
 
+        async function saveWhatsappConfig(e) {
+            e.preventDefault();
+            const client = getSupabase();
+            const phone = document.getElementById('whatsappNumber').value.trim();
+            const msg = document.getElementById('whatsappMessage').value.trim();
+            const { error } = await client.from('clients_config').upsert({
+                client_id: CLIENT_ID,
+                whatsapp_number: phone,
+                whatsapp_message: msg
+            }, { onConflict: 'client_id' });
+            if (error) alert("Error: " + error.message); else alert("¡WhatsApp guardado con éxito! 📱");
+        }
+
+        async function saveExperienceConfig(e) {
+            e.preventDefault();
+            const client = getSupabase();
+            const address = document.getElementById('atelierAddress').value.trim();
+            const expText = document.getElementById('experienceText').value.trim();
+            const { error } = await client.from('clients_config').upsert({
+                client_id: CLIENT_ID,
+                atelier_address: address,
+                experience_text: expText
+            }, { onConflict: 'client_id' });
+            if (error) alert("Error: " + error.message); else alert("¡Experiencia y dirección guardadas! 📍");
+        }
+
         async function saveHeroTextsConfig(e) {
             e.preventDefault();
             const client = getSupabase();
@@ -926,8 +985,12 @@
 
         async function loadHeroConfig() {
             const client = getSupabase();
-            const { data } = await client.from('clients_config').select('hero_title, hero_subtitle, welcome_photo, hero_photos').eq('client_id', CLIENT_ID).single();
+            const { data } = await client.from('clients_config').select('*').eq('client_id', CLIENT_ID).single();
             if (data) {
+                if (data.whatsapp_number) document.getElementById('whatsappNumber').value = data.whatsapp_number;
+                if (data.whatsapp_message) document.getElementById('whatsappMessage').value = data.whatsapp_message;
+                if (data.atelier_address) document.getElementById('atelierAddress').value = data.atelier_address;
+                if (data.experience_text) document.getElementById('experienceText').value = data.experience_text;
                 if (data.hero_title) document.getElementById('heroTitleText').value = data.hero_title;
                 if (data.hero_subtitle) document.getElementById('heroSubtitleText').value = data.hero_subtitle;
                 if (data.welcome_photo) {
@@ -945,6 +1008,11 @@
                         }
                     });
                 }
+            } else {
+                document.getElementById('heroTitleText').value = "Magia y Elegancia en tu Gran Día";
+                document.getElementById('heroSubtitleText').value = "Descubre nuestra exclusiva selección de vestidos de alta costura inspirados en la sofisticación moderna.";
+                document.getElementById('atelierAddress').value = "Alonso de Córdova 4200, Vitacura, Santiago";
+                document.getElementById('experienceText').value = "En Auro Novias sabemos que cada novia es única y que el día de tu boda merece un vestido deslumbrante que resalte tu belleza natural, sin importar tu talla. Creemos firmemente que el calce perfecto no debe ser un privilegio, sino una garantía.\n\nDescubre nuestra exclusiva colección de vestidos de novia diseñados para realzar tu figura, brindarte comodidad absoluta y hacerte brillar en tu camino al altar.";
             }
         }
 
