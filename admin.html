@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier Novias - Panel de Control Multi-Tenant</title>
+    <title>Auro Novias - Panel de Control Multi-Tenant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -412,7 +412,7 @@
 <body>
 
     <div id="loginSection" class="login-card">
-        <h2>🤍 Atelier Novias</h2>
+        <h2>🤍 Auro Novias</h2>
         <p>Panel de Administración y Colecciones</p>
         <input type="password" id="adminPassInput" class="login-input" placeholder="Ingresa la contraseña maestra..." onkeydown="if(event.key==='Enter') verifyLogin()">
         <button type="button" class="btn-login" onclick="verifyLogin()">Iniciar Sesión</button>
@@ -546,7 +546,7 @@
         </div>
 
         <div class="table-responsive">
-            <h3 style="color:var(--primary-rose); margin-bottom:15px;">📋 Inventario del Atelier (<span id="totalCount">0</span>)</h3>
+            <h3 style="color:var(--primary-rose); margin-bottom:15px;">📋 Inventario (<span id="totalCount">0</span>)</h3>
             <table>
                 <thead>
                     <tr>
@@ -641,7 +641,7 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const CLIENT_ID = urlParams.get('client') || 'plantas';
-        document.getElementById('dashMainTitle').innerHTML = `🕊️ Gestión Atelier <span class="badge-client">Cliente: ${CLIENT_ID}</span>`;
+        document.getElementById('dashMainTitle').innerHTML = `🕊️ Gestión  <span class="badge-client">Cliente: ${CLIENT_ID}</span>`;
 
         function getSupabase() {
             if (!mbAdminDb && window.supabase) {
