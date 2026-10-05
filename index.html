@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auro Novias Couture | Vestidos de Novia y Alta Costura</title>
-    <!-- Importación de tipografías elegantes (Playfair Display y Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -66,7 +65,7 @@
             color: var(--accent-gold);
         }
 
-        /* 1. Sección de Bienvenida Superior con Foto Oscura para resaltar título */
+        /* 1. Sección de Bienvenida Principal (Foto Oscura / Textos Editables) */
         .hero {
             position: relative;
             height: 80vh;
@@ -88,7 +87,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.55); /* Filtro más oscuro para que resalte el texto blanco */
+            background: rgba(0, 0, 0, 0.55); /* Filtro oscuro para resaltar texto blanco */
             z-index: 1;
         }
 
@@ -130,7 +129,7 @@
             color: var(--white);
         }
 
-        /* 2. Sección de Carrusel Intermedio (entre bienvenida y colección) con colores originales */
+        /* 2. Sección del Carrusel Intermedio (Entre bienvenida y colección) */
         .hero-carousel-section {
             position: relative;
             height: 60vh;
@@ -322,7 +321,6 @@
 </head>
 <body>
 
-    <!-- Cabecera boutique con Logotipo (Sin siluetas) -->
     <header>
         <a href="#" class="brand-logo">
             <img src="foto/logo.png" alt="Auro Novias Logo">
@@ -334,28 +332,23 @@
         </nav>
     </header>
 
-    <!-- 1. Sección de Bienvenida Principal (Foto Oscura / Especial) -->
     <section class="hero" id="heroWelcomeSection" style="background-image: url('https://images.unsplash.com/photo-1594552072238-b8a3272be6cc?w=1600&auto=format&fit=crop&q=80');">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1>Magia y Elegancia en tu Gran Día</h1>
-            <p>Descubre nuestra exclusiva selección de vestidos de alta costura inspirados en la sofisticación moderna.</p>
+            <h1 id="dynamicHeroTitle">Magia y Elegancia en tu Gran Día</h1>
+            <p id="dynamicHeroSubtitle">Descubre nuestra exclusiva selección de vestidos de alta costura inspirados en la sofisticación moderna.</p>
             <a href="#coleccion" class="btn-primary">Ver Colección Online</a>
         </div>
     </section>
 
-    <!-- 2. Sección del Carrusel Intermedio (Entre bienvenida y colección) -->
     <section class="hero-carousel-section" id="heroCarouselContainer">
-        <!-- Slides originales cargados desde Supabase -->
         <div class="hero-slide active-slide" style="background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&auto=format&fit=crop&q=80');"></div>
     </section>
 
-    <!-- Catálogo de Vestidos Dinámico conectado estrictamente al cliente -->
     <section id="coleccion" class="catalog-container">
         <h2 class="section-title">Colección Exclusiva</h2>
         <p class="section-subtitle">Cada diseño es seleccionado cuidadosamente para realzar tu belleza natural.</p>
 
-        <!-- Filtros de Categorías del Cliente -->
         <div id="categoriesFilterContainer" class="categories-filter">
             <button class="filter-btn active" onclick="filterCatalog('todos', this)">Todas</button>
         </div>
@@ -367,7 +360,6 @@
         </div>
     </section>
 
-    <!-- Footer Institucional con Declaración Tecnológica -->
     <footer>
         <p><strong>Auro Novias Couture</strong></p>
         <p>Especialistas en Vestidos de Novia y Accesorios de Alta Costura.</p>
@@ -416,12 +408,16 @@
             return defaultCategories;
         }
 
-        // --- CARGAR FOTO OSCURA DE BIENVENIDA Y CARRUSEL DESDE SUPABASE ---
+        // --- CARGAR TEXTOS, FOTO OSCURA Y CARRUSEL DESDE SUPABASE ---
         async function loadDynamicSiteDesign() {
             try {
-                const { data } = await mbDb.from('clients_config').select('welcome_photo, hero_photos').eq('client_id', CLIENT_ID).single();
+                const { data } = await mbDb.from('clients_config').select('hero_title, hero_subtitle, welcome_photo, hero_photos').eq('client_id', CLIENT_ID).single();
                 
                 if (data) {
+                    // Cargar textos de bienvenida editables
+                    if (data.hero_title) document.getElementById('dynamicHeroTitle').innerText = data.hero_title;
+                    if (data.hero_subtitle) document.getElementById('dynamicHeroSubtitle').innerText = data.hero_subtitle;
+
                     // Cargar foto oscura de bienvenida
                     if (data.welcome_photo) {
                         document.getElementById('heroWelcomeSection').style.backgroundImage = `url('${data.welcome_photo}')`;
