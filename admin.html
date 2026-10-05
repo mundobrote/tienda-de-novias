@@ -227,6 +227,7 @@
             overflow-x: auto;
             padding: 25px;
             box-shadow: 0 10px 30px rgba(180, 160, 150, 0.1);
+            margin-bottom: 35px;
         }
         table { width: 100%; border-collapse: collapse; text-align: left; }
         th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
@@ -236,7 +237,6 @@
         .price-sale { color: var(--success-color); font-weight: 700; }
         .price-before { color: var(--text-muted); font-size: 0.8rem; text-decoration: line-through; margin-left: 5px; }
 
-        /* Botón de información de seguridad de precio */
         .info-price-btn {
             display: inline-flex;
             align-items: center;
@@ -254,10 +254,7 @@
             vertical-align: middle;
             transition: all 0.2s;
         }
-        .info-price-btn:hover {
-            background: var(--gold-accent);
-            color: #fff;
-        }
+        .info-price-btn:hover { background: var(--gold-accent); color: #fff; }
 
         .stock-control {
             display: inline-flex;
@@ -330,7 +327,6 @@
         }
         .btn-delete:hover { background: var(--danger-color); color: #fff; }
 
-        /* Estilos generales para Modales */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -359,7 +355,6 @@
             font-family: 'Cormorant Garamond', serif;
         }
         
-        /* Modal de Categorías */
         .cat-modal-row {
             display: flex;
             gap: 10px;
@@ -380,7 +375,6 @@
             padding-top: 15px;
         }
 
-        /* Estilos del Modal de Recorte de Imagen */
         .cropper-container-box {
             max-height: 380px;
             background: #faf7f5;
@@ -392,10 +386,7 @@
             align-items: center;
             border: 1px solid var(--border-color);
         }
-        .cropper-container-box img {
-            max-width: 100%;
-            display: block;
-        }
+        .cropper-container-box img { max-width: 100%; display: block; }
         .modal-actions {
             display: flex;
             justify-content: space-between;
@@ -433,6 +424,47 @@
             <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
         </div>
 
+        <!-- SECCIÓN NUEVA: CONFIGURACIÓN DE FOTOS DE PORTADA (CARRUSEL) -->
+        <div class="form-card">
+            <h3>🖼️ Personalizar 5 Fotos de Portada (Carrusel)</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Sube o actualiza las 5 imágenes que rotarán automáticamente en la portada principal de tu tienda.</p>
+            <form id="heroConfigForm" onsubmit="saveHeroConfig(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Foto Portada 1 *</label>
+                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero1', 'heroFoto1')">
+                        <input type="hidden" id="heroFoto1">
+                        <img id="previewHero1" class="preview-img" alt="Hero 1">
+                    </div>
+                    <div class="form-group">
+                        <label>Foto Portada 2 *</label>
+                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero2', 'heroFoto2')">
+                        <input type="hidden" id="heroFoto2">
+                        <img id="previewHero2" class="preview-img" alt="Hero 2">
+                    </div>
+                    <div class="form-group">
+                        <label>Foto Portada 3 *</label>
+                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero3', 'heroFoto3')">
+                        <input type="hidden" id="heroFoto3">
+                        <img id="previewHero3" class="preview-img" alt="Hero 3">
+                    </div>
+                    <div class="form-group">
+                        <label>Foto Portada 4 *</label>
+                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero4', 'heroFoto4')">
+                        <input type="hidden" id="heroFoto4">
+                        <img id="previewHero4" class="preview-img" alt="Hero 4">
+                    </div>
+                    <div class="form-group">
+                        <label>Foto Portada 5 *</label>
+                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero5', 'heroFoto5')">
+                        <input type="hidden" id="heroFoto5">
+                        <img id="previewHero5" class="preview-img" alt="Hero 5">
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" style="margin-top: 10px;">💾 Guardar Fotos de Portada</button>
+            </form>
+        </div>
+
         <div id="formCardContainer" class="form-card">
             <h3 id="formTitle">✨ Agregar Nuevo Diseño / Vestido</h3>
             <form id="productForm" onsubmit="handleFormSubmit(event)">
@@ -449,9 +481,7 @@
                             Categoría *
                             <span class="label-action-link" onclick="openCategoriesModal()">✏️ Editar Categorías (Máx. 5)</span>
                         </label>
-                        <select id="pCategoria" class="form-control" required>
-                            <!-- Se llena dinámicamente -->
-                        </select>
+                        <select id="pCategoria" class="form-control" required></select>
                     </div>
 
                     <div class="form-group">
@@ -557,9 +587,7 @@
             <div class="modal-header">🏷️ Administrar Categorías (Máximo 5)</div>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Puedes editar los nombres de tus categorías existentes, eliminarlas o añadir nuevas.</p>
             
-            <div id="modalCategoriesList">
-                <!-- Se llenan con inputs editables -->
-            </div>
+            <div id="modalCategoriesList"></div>
 
             <div id="addCategorySection" style="margin-top: 15px; margin-bottom: 5px;">
                 <button type="button" class="btn-add-var" onclick="modalAddNewCategoryRow()" style="width: 100%; padding: 8px;">+ Añadir Categoría</button>
@@ -598,7 +626,6 @@
         let mbAdminDb = null;
         let cachedProducts = [];
 
-        // Categorías por defecto adaptadas para el Atelier
         let defaultCategories = [
             { id: "alta-costura", name: "👑 Alta Costura y Princesa" },
             { id: "civil", name: "💍 Vestidos de Matrimonio Civil" },
@@ -640,6 +667,7 @@
             document.getElementById('dashboardSection').style.display = 'block';
             loadCategoriesSelector();
             loadInventory();
+            loadHeroConfig();
         }
 
         function logout() {
@@ -647,16 +675,9 @@
             location.reload();
         }
 
-        // --- MODAL DE INFORMACIÓN DE SEGURIDAD ---
-        function showSecurityInfo() {
-            document.getElementById('securityModal').style.display = 'flex';
-        }
+        function showSecurityInfo() { document.getElementById('securityModal').style.display = 'flex'; }
+        function closeSecurityInfo() { document.getElementById('securityModal').style.display = 'none'; }
 
-        function closeSecurityInfo() {
-            document.getElementById('securityModal').style.display = 'none';
-        }
-
-        // --- SISTEMA DE GESTIÓN DE CATEGORÍAS (MÁXIMO 5) ---
         function getSavedCategories() {
             const stored = localStorage.getItem(`atelier_categories_${CLIENT_ID}`);
             if (stored) {
@@ -687,15 +708,12 @@
             document.getElementById('categoriesModal').style.display = 'flex';
         }
 
-        function closeCategoriesModal() {
-            document.getElementById('categoriesModal').style.display = 'none';
-        }
+        function closeCategoriesModal() { document.getElementById('categoriesModal').style.display = 'none'; }
 
         function renderModalCategoriesRows(cats) {
             const container = document.getElementById('modalCategoriesList');
             container.innerHTML = '';
-            
-            cats.forEach((c, idx) => {
+            cats.forEach((c) => {
                 const row = document.createElement('div');
                 row.className = 'cat-modal-row';
                 row.innerHTML = `
@@ -710,12 +728,7 @@
         function modalAddNewCategoryRow() {
             const container = document.getElementById('modalCategoriesList');
             const currentRows = container.querySelectorAll('.cat-modal-row');
-            
-            if (currentRows.length >= 5) {
-                alert("Solo puedes tener un máximo de 5 categorías.");
-                return;
-            }
-
+            if (currentRows.length >= 5) { alert("Solo puedes tener un máximo de 5 categorías."); return; }
             const row = document.createElement('div');
             row.className = 'cat-modal-row';
             row.innerHTML = `
@@ -729,10 +742,7 @@
         function removeCategoryRow(btn) {
             const container = document.getElementById('modalCategoriesList');
             const rows = container.querySelectorAll('.cat-modal-row');
-            if (rows.length <= 1) {
-                alert("Debes mantener al menos una categoría.");
-                return;
-            }
+            if (rows.length <= 1) { alert("Debes mantener al menos una categoría."); return; }
             btn.parentElement.remove();
             updateAddCategoryButtonVisibility();
         }
@@ -741,120 +751,116 @@
             const container = document.getElementById('modalCategoriesList');
             const rows = container.querySelectorAll('.cat-modal-row');
             const addBtn = document.querySelector('#addCategorySection button');
-            if (rows.length >= 5) {
-                addBtn.style.display = 'none';
-            } else {
-                addBtn.style.display = 'block';
-            }
+            if (rows.length >= 5) { addBtn.style.display = 'none'; } else { addBtn.style.display = 'block'; }
         }
 
         function saveCategoriesFromModal() {
             const container = document.getElementById('modalCategoriesList');
             const rowInputs = container.querySelectorAll('.modal-cat-name');
-            
             let newCategories = [];
             for (let input of rowInputs) {
                 const nameVal = input.value.trim();
-                if (!nameVal) {
-                    alert("Los nombres de las categorías no pueden estar vacíos.");
-                    return;
-                }
-                
+                if (!nameVal) { alert("Los nombres de las categorías no pueden estar vacíos."); return; }
                 let idVal = input.getAttribute('data-id');
                 if (!idVal) {
-                    idVal = nameVal.toLowerCase()
-                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                        .replace(/[^a-z0-9]/g, "-")
-                        .replace(/-+/g, "-") + "-" + Date.now().toString().slice(-4);
+                    idVal = nameVal.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-") + "-" + Date.now().toString().slice(-4);
                 }
                 newCategories.push({ id: idVal, name: nameVal });
             }
-
-            if (newCategories.length > 5) {
-                alert("El límite máximo es de 5 categorías.");
-                return;
-            }
-
+            if (newCategories.length > 5) { alert("El límite máximo es de 5 categorías."); return; }
             saveCategoriesToStorage(newCategories);
             loadCategoriesSelector();
             loadInventory();
             closeCategoriesModal();
             alert("¡Categorías actualizadas con éxito! ✨");
         }
-        // ----------------------------------------------------
 
         function initCropProcess(input, previewId, hiddenInputId) {
             const file = input.files[0];
             if (!file) return;
-
             currentFileInput = input;
             currentPreviewImgId = previewId;
             currentHiddenInputId = hiddenInputId;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const targetImg = document.getElementById('cropImageTarget');
                 targetImg.src = e.target.result;
-
                 document.getElementById('cropModal').style.display = 'flex';
-
-                if (cropperInstance) {
-                    cropperInstance.destroy();
-                }
-
-                cropperInstance = new Cropper(targetImg, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    autoCropArea: 0.9,
-                    responsive: true
-                });
+                if (cropperInstance) { cropperInstance.destroy(); }
+                cropperInstance = new Cropper(targetImg, { aspectRatio: 16/9, viewMode: 1, autoCropArea: 0.9, responsive: true });
             };
             reader.readAsDataURL(file);
         }
 
-        function rotateCropImage(degree) {
-            if (cropperInstance) {
-                cropperInstance.rotate(degree);
-            }
-        }
-
+        function rotateCropImage(degree) { if (cropperInstance) { cropperInstance.rotate(degree); } }
         function closeCropModal() {
             document.getElementById('cropModal').style.display = 'none';
-            if (cropperInstance) {
-                cropperInstance.destroy();
-                cropperInstance = null;
-            }
-            if (currentFileInput) {
-                currentFileInput.value = '';
-            }
+            if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+            if (currentFileInput) { currentFileInput.value = ''; }
         }
 
         function confirmCropImage() {
             if (!cropperInstance) return;
-
-            const canvas = cropperInstance.getCroppedCanvas({
-                width: 800,
-                height: 800
-            });
-
+            const canvas = cropperInstance.getCroppedCanvas({ width: 1200, height: 675 });
             const base64Cropped = canvas.toDataURL('image/jpeg', 0.85);
-
             if (currentPreviewImgId) {
                 const prev = document.getElementById(currentPreviewImgId);
                 prev.src = base64Cropped;
                 prev.style.display = 'block';
             }
-
             if (currentHiddenInputId) {
                 document.getElementById(currentHiddenInputId).value = base64Cropped;
-            } else if (currentFileInput && currentFileInput.classList.contains('var-file')) {
-                currentFileInput.parentElement.querySelector('.var-img').value = base64Cropped;
             }
-
             document.getElementById('cropModal').style.display = 'none';
             cropperInstance.destroy();
             cropperInstance = null;
         }
+
+        // --- GUARDAR Y CARGAR CONFIGURACIÓN DE FOTOS DE PORTADA EN SUPABASE ---
+        async function saveHeroConfig(e) {
+            e.preventDefault();
+            const client = getSupabase();
+            const fotosHero = [
+                document.getElementById('heroFoto1').value,
+                document.getElementById('heroFoto2').value,
+                document.getElementById('heroFoto3').value,
+                document.getElementById('heroFoto4').value,
+                document.getElementById('heroFoto5').value
+            ];
+
+            if (fotosHero.some(f => !f)) {
+                alert("Por favor selecciona y recorta las 5 fotos de portada.");
+                return;
+            }
+
+            const { error } = await client.from('clients_config').upsert({
+                client_id: CLIENT_ID,
+                hero_photos: fotosHero
+            }, { onConflict: 'client_id' });
+
+            if (error) {
+                alert("Error al guardar las fotos de portada: " + error.message);
+            } else {
+                alert("¡Fotos de portada actualizadas con éxito! ✨");
+            }
+        }
+
+        async function loadHeroConfig() {
+            const client = getSupabase();
+            const { data } = await client.from('clients_config').select('hero_photos').eq('client_id', CLIENT_ID).single();
+            if (data && data.hero_photos && Array.isArray(data.hero_photos)) {
+                data.hero_photos.forEach((fotoUrl, idx) => {
+                    const num = idx + 1;
+                    if (fotoUrl) {
+                        document.getElementById(`heroFoto${num}`).value = fotoUrl;
+                        const prev = document.getElementById(`previewHero${num}`);
+                        prev.src = fotoUrl;
+                        prev.style.display = 'block';
+                    }
+                });
+            }
+        }
+        // -------------------------------------------------------------------
 
         function addVariantRow(name = '', img = '', stock = 2) {
             const container = document.getElementById('variantsContainer');
@@ -874,42 +880,20 @@
             const client = getSupabase();
             const tbody = document.getElementById('inventoryTableBody');
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Cargando inventario...</td></tr>';
-
-            if (!client) {
-                setTimeout(loadInventory, 800);
-                return;
-            }
-
+            if (!client) { setTimeout(loadInventory, 800); return; }
             try {
-                const { data: productos, error } = await client
-                    .from('productos')
-                    .select('*')
-                    .eq('client_id', CLIENT_ID)
-                    .order('id', { ascending: true });
-
-                if (error) {
-                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger-color);">Error: ${error.message}</td></tr>`;
-                    return;
-                }
-
+                const { data: productos, error } = await client.from('productos').select('*').eq('client_id', CLIENT_ID).order('id', { ascending: true });
+                if (error) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger-color);">Error: ${error.message}</td></tr>`; return; }
                 cachedProducts = productos || [];
                 document.getElementById('totalCount').innerText = cachedProducts.length;
-
-                if (cachedProducts.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay diseños registrados para este cliente.</td></tr>';
-                    return;
-                }
-
+                if (cachedProducts.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay diseños registrados para este cliente.</td></tr>'; return; }
                 const cats = getSavedCategories();
-                const catMap = {};
-                cats.forEach(c => catMap[c.id] = c.name);
-
+                const catMap = {}; cats.forEach(c => catMap[c.id] = c.name);
                 tbody.innerHTML = '';
                 cachedProducts.forEach(p => {
                     const currentStock = p.stock !== undefined ? p.stock : 2;
                     const isAgotado = (p.estado === 'agotado' || currentStock <= 0);
                     const categoryDisplayName = catMap[p.categoria] || p.categoria;
-
                     let variantesHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">Sin tallas adicionales</span>';
                     if (p.opciones && Array.isArray(p.opciones) && p.opciones.length > 0) {
                         variantesHtml = p.opciones.map((opt, idx) => {
@@ -927,10 +911,8 @@
                             `;
                         }).join('');
                     }
-
                     const hasOffer = p.precio_antes && parseInt(p.precio_antes) > (p.precio_num || 0);
                     const formattedBefore = hasOffer ? '$' + parseInt(p.precio_antes).toLocaleString('es-CL') : '';
-
                     let tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td><img src="${p.foto || 'fondo.jpg'}" class="table-img" onerror="this.src='fondo.jpg'"></td>
@@ -962,56 +944,35 @@
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger-color);">Error: ${err.message}</td></tr>`;
-            }
+            } catch (err) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger-color);">Error: ${err.message}</td></tr>`; }
         }
 
         function startEditProduct(productId) {
             const product = cachedProducts.find(p => p.id === productId);
             if (!product) return;
-
             document.getElementById('editProductId').value = product.id;
             document.getElementById('pNombre').value = product.nombre;
             document.getElementById('pCategoria').value = product.categoria;
             document.getElementById('pPrecioNum').value = product.precio_num || parseInt(product.precio.replace(/[^0-9]/g, '')) || 0;
             document.getElementById('pPrecioAntes').value = (product.precio_antes !== null && product.precio_antes !== undefined) ? product.precio_antes : '';
             document.getElementById('pStock').value = product.stock !== undefined ? product.stock : 2;
-            
             document.getElementById('pFoto').value = product.foto || '';
             const prevMain = document.getElementById('previewMain');
-            if (product.foto) {
-                prevMain.src = product.foto;
-                prevMain.style.display = 'block';
-            } else {
-                prevMain.style.display = 'none';
-            }
-
+            if (product.foto) { prevMain.src = product.foto; prevMain.style.display = 'block'; } else { prevMain.style.display = 'none'; }
             document.getElementById('pFotoGrande').value = product.foto_grande || '';
             const prevGrande = document.getElementById('previewGrande');
-            if (product.foto_grande) {
-                prevGrande.src = product.foto_grande;
-                prevGrande.style.display = 'block';
-            } else {
-                prevGrande.style.display = 'none';
-            }
-
+            if (product.foto_grande) { prevGrande.src = product.foto_grande; prevGrande.style.display = 'block'; } else { prevGrande.style.display = 'none'; }
             document.getElementById('pEsNovedad').value = product.es_novedad ? 'true' : 'false';
             document.getElementById('pCuidados').value = product.cuidados || '';
-
             const variantsContainer = document.getElementById('variantsContainer');
             variantsContainer.innerHTML = '';
             if (product.opciones && Array.isArray(product.opciones)) {
-                product.opciones.forEach(opt => {
-                    addVariantRow(opt.name, opt.img || '', opt.stock !== undefined ? opt.stock : 2);
-                });
+                product.opciones.forEach(opt => { addVariantRow(opt.name, opt.img || '', opt.stock !== undefined ? opt.stock : 2); });
             }
-
             document.getElementById('formTitle').innerText = `✏️ Editando: ${product.nombre}`;
             document.getElementById('btnSubmitForm').innerText = '💾 Guardar Cambios';
             document.getElementById('btnCancelEdit').style.display = 'inline-block';
             document.getElementById('formCardContainer').classList.add('edit-mode');
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1040,13 +1001,8 @@
             const precioAntes = rawPrecioAntes !== "" ? parseInt(rawPrecioAntes) : null;
             const stockNum = parseInt(document.getElementById('pStock').value) || 0;
             const formattedPrice = '$' + precioNum.toLocaleString('es-CL');
-
             const fotoVal = document.getElementById('pFoto').value.trim();
-            if (!fotoVal) {
-                alert("Por favor selecciona una foto principal desde tu computadora.");
-                return;
-            }
-
+            if (!fotoVal) { alert("Por favor selecciona una foto principal desde tu computadora."); return; }
             const varRows = document.querySelectorAll('.variant-row');
             let opciones = [];
             varRows.forEach(row => {
@@ -1056,7 +1012,6 @@
                 const status = (stock > 0) ? 'disponible' : 'agotado';
                 if (name) opciones.push({ name, img, stock, status });
             });
-
             const productPayload = {
                 client_id: CLIENT_ID,
                 nombre: document.getElementById('pNombre').value.trim(),
@@ -1072,9 +1027,7 @@
                 opciones: opciones,
                 estado: (stockNum > 0) ? 'disponible' : 'agotado'
             };
-
             let resultError = null;
-
             if (editId) {
                 const { error } = await client.from('productos').update(productPayload).eq('id', editId);
                 resultError = error;
@@ -1082,13 +1035,9 @@
                 const { error } = await client.from('productos').insert([productPayload]);
                 resultError = error;
             }
-
-            if (resultError) {
-                alert("Error al procesar: " + resultError.message);
-            } else {
+            if (resultError) { alert("Error al procesar: " + resultError.message); } else {
                 alert(editId ? "¡Diseño modificado con éxito! 🤍" : "¡Diseño agregado al catálogo! 🤍");
-                resetFormToCreate();
-                loadInventory();
+                resetFormToCreate(); loadInventory();
             }
         }
 
@@ -1104,7 +1053,6 @@
             const client = getSupabase();
             const { data: p, error } = await client.from('productos').select('opciones').eq('id', productId).single();
             if (error || !p || !p.opciones) return;
-
             let updatedOpciones = [...p.opciones];
             if (updatedOpciones[varIndex]) {
                 const currentVarStock = updatedOpciones[varIndex].stock !== undefined ? updatedOpciones[varIndex].stock : 2;
@@ -1131,9 +1079,7 @@
             }
         }
 
-        if (sessionStorage.getItem('mb_admin_auth') === 'true') {
-            showDashboard();
-        }
+        if (sessionStorage.getItem('mb_admin_auth') === 'true') { showDashboard(); }
     </script>
 </body>
 </html>
