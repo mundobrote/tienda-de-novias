@@ -460,49 +460,63 @@
 
         <!-- BOTONES DE SECCIÓN / PESTAÑAS -->
         <div class="panel-nav-tabs">
-            <button type="button" class="tab-btn active-tab" onclick="switchSection('personalizar')" id="tabPersonalizar">🖼️ 1. Personalizar Sitio</button>
+            <button type="button" class="tab-btn active-tab" onclick="switchSection('personalizar')" id="tabPersonalizar">🖼️️ 1. Personalizar Sitio</button>
             <button type="button" class="tab-btn" onclick="switchSection('inventario')" id="tabInventario">👗 2. Inventario</button>
         </div>
 
-        <!-- SECCIÓN 1: PERSONALIZAR SITIO (FOTOS DE PORTADA) -->
+        <!-- SECCIÓN 1: PERSONALIZAR SITIO (FOTO MAGIA Y ELEGANCIA + CARRUSEL DE 5 FOTOS) -->
         <div id="sectionPersonalizar" class="panel-section active-section">
             <div class="form-card">
-                <h3>🖼️ Personalizar 5 Fotos de Portada (Carrusel)</h3>
-                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Sube o actualiza las 5 imágenes que rotarán automáticamente en la portada principal de tu tienda.</p>
+                <h3>✨ Foto de Bienvenida ("Magia y Elegancia")</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Sube la foto especial oscura para que resalte el texto de bienvenida principal.</p>
+                <form id="heroWelcomeForm" onsubmit="saveWelcomeHeroConfig(event)">
+                    <div class="form-group" style="max-width: 400px; margin-bottom: 15px;">
+                        <label>Foto de Bienvenida Oscura *</label>
+                        <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewWelcome', 'welcomeFoto')">
+                        <input type="hidden" id="welcomeFoto">
+                        <img id="previewWelcome" class="preview-img" alt="Bienvenida">
+                    </div>
+                    <button type="submit" class="btn-submit">💾 Guardar Foto de Bienvenida</button>
+                </form>
+            </div>
+
+            <div class="form-card">
+                <h3>🖼️ Personalizar 5 Fotos de Carrusel (Intermedias)</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Sube o actualiza las 5 imágenes que rotarán automáticamente entre la bienvenida y el catálogo.</p>
                 <form id="heroConfigForm" onsubmit="saveHeroConfig(event)">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Foto Portada 1 *</label>
+                            <label>Foto Carrusel 1 *</label>
                             <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero1', 'heroFoto1')">
                             <input type="hidden" id="heroFoto1">
                             <img id="previewHero1" class="preview-img" alt="Hero 1">
                         </div>
                         <div class="form-group">
-                            <label>Foto Portada 2 *</label>
+                            <label>Foto Carrusel 2 *</label>
                             <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero2', 'heroFoto2')">
                             <input type="hidden" id="heroFoto2">
                             <img id="previewHero2" class="preview-img" alt="Hero 2">
                         </div>
                         <div class="form-group">
-                            <label>Foto Portada 3 *</label>
+                            <label>Foto Carrusel 3 *</label>
                             <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero3', 'heroFoto3')">
                             <input type="hidden" id="heroFoto3">
                             <img id="previewHero3" class="preview-img" alt="Hero 3">
                         </div>
                         <div class="form-group">
-                            <label>Foto Portada 4 *</label>
+                            <label>Foto Carrusel 4 *</label>
                             <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero4', 'heroFoto4')">
                             <input type="hidden" id="heroFoto4">
                             <img id="previewHero4" class="preview-img" alt="Hero 4">
                         </div>
                         <div class="form-group">
-                            <label>Foto Portada 5 *</label>
+                            <label>Foto Carrusel 5 *</label>
                             <input type="file" class="form-control" accept="image/*" onchange="initCropProcess(this, 'previewHero5', 'heroFoto5')">
                             <input type="hidden" id="heroFoto5">
                             <img id="previewHero5" class="preview-img" alt="Hero 5">
                         </div>
                     </div>
-                    <button type="submit" class="btn-submit" style="margin-top: 10px;">💾 Guardar Fotos de Portada</button>
+                    <button type="submit" class="btn-submit" style="margin-top: 10px;">💾 Guardar Fotos de Carrusel</button>
                 </form>
             </div>
         </div>
@@ -715,7 +729,6 @@
             location.reload();
         }
 
-        // --- SISTEMA DE PESTAÑAS (SECCIONES) ---
         function switchSection(sectionName) {
             document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active-section'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
@@ -868,6 +881,15 @@
             cropperInstance = null;
         }
 
+        async function saveWelcomeHeroConfig(e) {
+            e.preventDefault();
+            const client = getSupabase();
+            const welcomeFoto = document.getElementById('welcomeFoto').value;
+            if (!welcomeFoto) { alert("Selecciona una foto de bienvenida."); return; }
+            const { error } = await client.from('clients_config').upsert({ client_id: CLIENT_ID, welcome_photo: welcomeFoto }, { onConflict: 'client_id' });
+            if (error) alert("Error: " + error.message); else alert("¡Foto de bienvenida guardada con éxito! ✨");
+        }
+
         async function saveHeroConfig(e) {
             e.preventDefault();
             const client = getSupabase();
@@ -878,37 +900,30 @@
                 document.getElementById('heroFoto4').value,
                 document.getElementById('heroFoto5').value
             ];
-
-            if (fotosHero.some(f => !f)) {
-                alert("Por favor selecciona y recorta las 5 fotos de portada.");
-                return;
-            }
-
-            const { error } = await client.from('clients_config').upsert({
-                client_id: CLIENT_ID,
-                hero_photos: fotosHero
-            }, { onConflict: 'client_id' });
-
-            if (error) {
-                alert("Error al guardar las fotos de portada: " + error.message);
-            } else {
-                alert("¡Fotos de portada actualizadas con éxito! ✨");
-            }
+            if (fotosHero.some(f => !f)) { alert("Selecciona y recorta las 5 fotos de carrusel."); return; }
+            const { error } = await client.from('clients_config').upsert({ client_id: CLIENT_ID, hero_photos: fotosHero }, { onConflict: 'client_id' });
+            if (error) alert("Error: " + error.message); else alert("¡Fotos de carrusel actualizadas con éxito! ✨");
         }
 
         async function loadHeroConfig() {
             const client = getSupabase();
-            const { data } = await client.from('clients_config').select('hero_photos').eq('client_id', CLIENT_ID).single();
-            if (data && data.hero_photos && Array.isArray(data.hero_photos)) {
-                data.hero_photos.forEach((fotoUrl, idx) => {
-                    const num = idx + 1;
-                    if (fotoUrl) {
-                        document.getElementById(`heroFoto${num}`).value = fotoUrl;
-                        const prev = document.getElementById(`previewHero${num}`);
-                        prev.src = fotoUrl;
-                        prev.style.display = 'block';
-                    }
-                });
+            const { data } = await client.from('clients_config').select('welcome_photo, hero_photos').eq('client_id', CLIENT_ID).single();
+            if (data) {
+                if (data.welcome_photo) {
+                    document.getElementById('welcomeFoto').value = data.welcome_photo;
+                    const prevW = document.getElementById('previewWelcome');
+                    prevW.src = data.welcome_photo; prevW.style.display = 'block';
+                }
+                if (data.hero_photos && Array.isArray(data.hero_photos)) {
+                    data.hero_photos.forEach((fotoUrl, idx) => {
+                        const num = idx + 1;
+                        if (fotoUrl) {
+                            document.getElementById(`heroFoto${num}`).value = fotoUrl;
+                            const prev = document.getElementById(`previewHero${num}`);
+                            prev.src = fotoUrl; prev.style.display = 'block';
+                        }
+                    });
+                }
             }
         }
 
@@ -936,7 +951,7 @@
                 if (error) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger-color);">Error: ${error.message}</td></tr>`; return; }
                 cachedProducts = productos || [];
                 document.getElementById('totalCount').innerText = cachedProducts.length;
-                if (cachedProducts.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay diseños registrados para este cliente.</td></tr>'; return; }
+                if (cachedProducts.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay diseños registrados.</td></tr>'; return; }
                 const cats = getSavedCategories();
                 const catMap = {}; cats.forEach(c => catMap[c.id] = c.name);
                 tbody.innerHTML = '';
@@ -944,7 +959,7 @@
                     const currentStock = p.stock !== undefined ? p.stock : 2;
                     const isAgotado = (p.estado === 'agotado' || currentStock <= 0);
                     const categoryDisplayName = catMap[p.categoria] || p.categoria;
-                    let variantesHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">Sin tallas adicionales</span>';
+                    let variantesHtml = '<span style="color:var(--text-muted); font-size:0.8rem;">Sin tallas</span>';
                     if (p.opciones && Array.isArray(p.opciones) && p.opciones.length > 0) {
                         variantesHtml = p.opciones.map((opt, idx) => {
                             const optStock = opt.stock !== undefined ? opt.stock : 2;
@@ -1052,7 +1067,7 @@
             const stockNum = parseInt(document.getElementById('pStock').value) || 0;
             const formattedPrice = '$' + precioNum.toLocaleString('es-CL');
             const fotoVal = document.getElementById('pFoto').value.trim();
-            if (!fotoVal) { alert("Por favor selecciona una foto principal desde tu computadora."); return; }
+            if (!fotoVal) { alert("Selecciona una foto principal."); return; }
             const varRows = document.querySelectorAll('.variant-row');
             let opciones = [];
             varRows.forEach(row => {
@@ -1085,7 +1100,7 @@
                 const { error } = await client.from('productos').insert([productPayload]);
                 resultError = error;
             }
-            if (resultError) { alert("Error al procesar: " + resultError.message); } else {
+            if (resultError) { alert("Error: " + resultError.message); } else {
                 alert(editId ? "¡Diseño modificado con éxito! 🤍" : "¡Diseño agregado al catálogo! 🤍");
                 resetFormToCreate(); loadInventory();
             }
