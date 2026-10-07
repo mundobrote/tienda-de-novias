@@ -67,7 +67,7 @@
             color: var(--accent-gold);
         }
 
-        /* 1. Sección de Bienvenida Principal (Foto Oscura / Textos Editables) */
+        /* 1. Sección de Bienvenida Principal */
         .hero {
             position: relative;
             height: 80vh;
@@ -89,7 +89,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.55); /* Filtro oscuro para resaltar texto blanco */
+            background: rgba(0, 0, 0, 0.55);
             z-index: 1;
         }
 
@@ -132,7 +132,7 @@
             color: var(--white);
         }
 
-        /* 2. Sección del Carrusel Intermedio (Entre bienvenida y colección) */
+        /* 2. Sección del Carrusel Intermedio */
         .hero-carousel-section {
             position: relative;
             height: 60vh;
@@ -174,7 +174,7 @@
             text-transform: uppercase;
         }
 
-        /* Botones Flotantes (WhatsApp e Instagram) */
+        /* Botones Flotantes */
         .floating-widgets {
             position: fixed;
             bottom: 25px;
@@ -201,7 +201,7 @@
         .whatsapp-float { background-color: #25d366; color: white; }
         .instagram-float { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: white; }
 
-        /* Filtros de Categorías Dinámicas */
+        /* Filtros de Categorías */
         .categories-filter {
             display: flex;
             justify-content: center;
@@ -229,7 +229,7 @@
             color: var(--white);
         }
 
-        /* Sección de Catálogo / Colección */
+        /* Catálogo */
         .catalog-container {
             max-width: 1300px;
             margin: 80px auto;
@@ -263,6 +263,7 @@
             border-radius: 4px;
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
         }
 
         .dress-card:hover {
@@ -333,7 +334,45 @@
             color: var(--white);
         }
 
-        /* Footer Corporativo y Legal */
+        /* MODAL DE DETALLE A PANTALLA COMPLETA */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-box {
+            background: var(--white);
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            border-radius: 8px;
+            overflow-y: auto;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        @media(max-width: 768px) { .modal-box { grid-template-columns: 1fr; max-height: 95vh; } }
+        
+        .modal-img-container { background: #f1ede6; min-height: 400px; position: relative; }
+        .modal-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-body { padding: 40px 30px; display: flex; flex-direction: column; justify-content: space-between; }
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; background: rgba(0,0,0,0.5); color: #fff;
+            border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;
+            z-index: 10; display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+        }
+        .close-modal:hover { background: #000; }
+        .modal-variants-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 15px 0; }
+        .variant-pill { background: #f1ede6; border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+
+        /* Footer */
         footer {
             background-color: #212121;
             color: #d1ccb8;
@@ -344,30 +383,15 @@
             margin-top: 100px;
             line-height: 1.6;
         }
-
-        footer p {
-            margin: 8px 0;
-        }
-
+        footer p { margin: 8px 0; }
         .footer-tech {
-            margin-top: 20px;
-            font-size: 0.75rem;
-            color: #9e998d;
-            letter-spacing: 0.5px;
-            border-top: 1px solid #333333;
-            padding-top: 20px;
-        }
-
-        @media(max-width: 768px) {
-            header { padding: 20px; flex-direction: column; gap: 15px; }
-            nav a { margin: 0 10px; }
-            .hero h1 { font-size: 2.5rem; }
+            margin-top: 20px; font-size: 0.75rem; color: #9e998d;
+            border-top: 1px solid #333333; padding-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Cabecera boutique con Logotipo (Sin siluetas) -->
     <header>
         <a href="#" class="brand-logo">
             <img src="foto/logo.png" alt="Auro Novias Logo">
@@ -379,13 +403,11 @@
         </nav>
     </header>
 
-    <!-- Botones Flotantes (WhatsApp e Instagram) -->
     <div class="floating-widgets">
         <a href="https://instagram.com/auro_novias_" target="_blank" class="float-btn instagram-float" title="Instagram">📸</a>
         <a id="floatingWhatsappLink" href="#" target="_blank" class="float-btn whatsapp-float" title="WhatsApp">💬</a>
     </div>
 
-    <!-- 1. Sección de Bienvenida Principal (Foto Oscura / Textos Editables) -->
     <section class="hero" id="heroWelcomeSection" style="background-image: url('https://images.unsplash.com/photo-1594552072238-b8a3272be6cc?w=1600&auto=format&fit=crop&q=80');">
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -395,12 +417,10 @@
         </div>
     </section>
 
-    <!-- 2. Sección del Carrusel Intermedio (Entre bienvenida y colección) -->
     <section class="hero-carousel-section" id="heroCarouselContainer">
         <div class="hero-slide active-slide" style="background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&auto=format&fit=crop&q=80');"></div>
     </section>
 
-    <!-- 3. Sección Experiencia e Ubicación -->
     <section id="experiencia" class="experience-container">
         <h2 class="section-title">La Experiencia Auro Novias</h2>
         <p class="section-subtitle" id="dynamicExperienceText" style="margin-top: 25px; line-height: 1.8; font-size: 1.05rem; white-space: pre-line;">
@@ -410,12 +430,10 @@
         <div class="experience-address" id="dynamicAtelierAddress">📍 Alonso de Córdova 4200, Vitacura, Santiago</div>
     </section>
 
-    <!-- Catálogo de Vestidos Dinámico conectado estrictamente al cliente -->
     <section id="coleccion" class="catalog-container">
         <h2 class="section-title">Colección Exclusiva</h2>
         <p class="section-subtitle">Cada diseño es seleccionado cuidadosamente para realzar tu belleza natural.</p>
 
-        <!-- Filtros de Categorías del Cliente -->
         <div id="categoriesFilterContainer" class="categories-filter">
             <button class="filter-btn active" onclick="filterCatalog('todos', this)">Todas</button>
         </div>
@@ -427,7 +445,33 @@
         </div>
     </section>
 
-    <!-- Footer Institucional con Declaración Tecnológica -->
+    <!-- MODAL DE DETALLE A PANTALLA COMPLETA -->
+    <div id="productModal" class="modal-overlay" onclick="closeProductModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="closeProductModal()">✕</button>
+            <div class="modal-img-container">
+                <img id="modalImg" src="" alt="Vestido Detalle">
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div id="modalCategory" class="dress-category" style="margin-bottom: 5px;"></div>
+                    <h2 id="modalTitle" style="font-size: 1.8rem; margin-bottom: 10px;"></h2>
+                    <div id="modalPrice" class="dress-price" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;"></div>
+                    
+                    <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-top: 10px;">Tallas Disponibles:</div>
+                    <div id="modalVariants" class="modal-variants-list"></div>
+
+                    <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-top: 15px;">Detalles del Diseño:</div>
+                    <p id="modalDescription" style="font-size: 0.95rem; line-height: 1.7; color: var(--text-main); white-space: pre-line; margin-top: 5px; background: #faf7f5; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color);"></p>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button id="modalWhatsappBtn" class="btn-primary" style="width: 100%; text-align: center; background: var(--accent-gold); color: white;">Consultar / Reservar Cita en WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <p><strong>Auro Novias Couture</strong></p>
         <p>Especialistas en Vestidos de Novia y Accesorios de Alta Costura.</p>
@@ -444,23 +488,20 @@
         const urlParams = new URLSearchParams(window.location.search);
         const CLIENT_ID = urlParams.get('client');
 
-        // --- VALIDACIÓN DE SEGURIDAD ESTRICTA (EVITA DATOS CRUZADOS) ---
         if (!CLIENT_ID) {
             document.getElementById('catalogGrid').innerHTML = `
                 <div style="grid-column: 1 / -1; text-align: center; color: #bc4749; padding: 40px;">
                     <h3>⚠️ Enlace incompleto o no autorizado</h3>
-                    <p style="margin-top: 10px; color: var(--text-muted);">Por favor accede utilizando el enlace personalizado asignado a tu tienda (ej: index.html?client=tu_id).</p>
+                    <p style="margin-top: 10px; color: var(--text-muted);">Por favor accede utilizando el enlace personalizado asignado a tu tienda.</p>
                 </div>`;
-            throw new Error("Falta el parámetro client en la URL para aislar los datos.");
+            throw new Error("Falta el parámetro client en la URL.");
         }
-        // -------------------------------------------------------------
 
         let globalWhatsappNumber = "56912345678";
         let globalWhatsappMessage = "Hola, me gustaría agendar una cita en Auro Novias.";
         let allProducts = [];
         let currentFilter = 'todos';
 
-        // Categorías por defecto
         let defaultCategories = [
             { id: "alta-costura", name: "👑 Alta Costura y Princesa" },
             { id: "civil", name: "💍 Vestidos de Matrimonio Civil" },
@@ -472,9 +513,7 @@
         function getSavedCategories() {
             if (!CLIENT_ID) return defaultCategories;
             const stored = localStorage.getItem(`atelier_categories_${CLIENT_ID}`);
-            if (stored) {
-                try { return JSON.parse(stored); } catch(e) {}
-            }
+            if (stored) { try { return JSON.parse(stored); } catch(e) {} }
             return defaultCategories;
         }
 
@@ -484,15 +523,12 @@
             window.open(url, '_blank');
         }
 
-        // --- CARGAR DATOS DESDE SUPABASE ---
         async function loadDynamicSiteDesign() {
             try {
                 const { data } = await mbDb.from('clients_config').select('*').eq('client_id', CLIENT_ID).single();
-                
                 if (data) {
                     if (data.whatsapp_number) globalWhatsappNumber = data.whatsapp_number;
                     if (data.whatsapp_message) globalWhatsappMessage = data.whatsapp_message;
-
                     document.getElementById('floatingWhatsappLink').href = `https://wa.me/${globalWhatsappNumber}?text=` + encodeURIComponent(globalWhatsappMessage);
 
                     if (data.hero_title) document.getElementById('dynamicHeroTitle').innerText = data.hero_title;
@@ -502,7 +538,6 @@
                     if (data.experience_text) document.getElementById('dynamicExperienceText').innerText = data.experience_text;
                     if (data.atelier_address) document.getElementById('dynamicAtelierAddress').innerText = "📍 " + data.atelier_address;
 
-                    // Cargar 5 fotos del carrusel intermedio
                     if (data.hero_photos && Array.isArray(data.hero_photos) && data.hero_photos.length > 0) {
                         const carouselContainer = document.getElementById('heroCarouselContainer');
                         let slidesHtml = data.hero_photos.map((url, idx) => `
@@ -511,8 +546,6 @@
                         carouselContainer.innerHTML = slidesHtml;
                     }
                 }
-
-                // Iniciar rotación automática del carrusel intermedio
                 let slides = document.querySelectorAll(".hero-slide");
                 let currentSlide = 0;
                 if (slides.length > 1) {
@@ -522,60 +555,12 @@
                         slides[currentSlide].classList.add("active-slide");
                     }, 4000);
                 }
-            } catch (e) {
-                console.log("Usando diseño predeterminado.");
-            }
+            } catch (e) { console.log("Diseño predeterminado cargado."); }
         }
-
-        // ==========================================
-        // VERIFICACIÓN DE ESTADO COMERCIAL (B2B)
-        // ==========================================
-        async function checkClientStatusSupabase() {
-            if (!CLIENT_ID) return;
-            try {
-                const { data, error } = await mbDb
-                    .from('clients_config')
-                    .select('is_active, status_message')
-                    .eq('client_id', CLIENT_ID)
-                    .single();
-
-                if (data && data.is_active === false) {
-                    renderMaintenanceOverlay(data.status_message);
-                }
-            } catch (e) {
-                console.log("Infraestructura operativa.");
-            }
-        }
-
-        function renderMaintenanceOverlay(customMessage) {
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: rgba(43, 43, 43, 0.96); backdrop-filter: blur(8px);
-                z-index: 99999; display: flex; flex-direction: column;
-                align-items: center; justify-content: center; text-align: center;
-                padding: 24px; font-family: 'Inter', sans-serif; color: #fbf9f6;
-            `;
-            const msgText = customMessage || 'Esta plataforma de alta costura se encuentra temporalmente inactiva por período de pruebas o actualización de suscripción de plataforma.';
-            overlay.innerHTML = `
-                <div style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #c5a059; margin-bottom: 15px; letter-spacing: 2px;">Servicio Temporalmente Suspendido</div>
-                <p style="max-width: 600px; color: #d1ccb8; line-height: 1.6; margin-bottom: 30px; font-size: 1.05rem; font-weight: 300;">
-                    ${msgText}
-                </p>
-                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #736e65; border-top: 1px solid #444; padding-top: 20px; width: 200px;">
-                    AXOPTEC Platform
-                </div>
-            `;
-            document.body.innerHTML = '';
-            document.body.appendChild(overlay);
-            document.body.style.overflow = 'hidden';
-        }
-        // ==========================================
 
         function renderCategoryFilters() {
             const cats = getSavedCategories();
             const container = document.getElementById('categoriesFilterContainer');
-            
             let html = `<button class="filter-btn ${currentFilter === 'todos' ? 'active' : ''}" onclick="filterCatalog('todos', this)">Todas</button>`;
             cats.forEach(c => {
                 html += `<button class="filter-btn ${currentFilter === c.id ? 'active' : ''}" onclick="filterCatalog('${c.id}', this)">${c.name}</button>`;
@@ -592,19 +577,12 @@
 
         async function fetchProductsFromSupabase() {
             const grid = document.getElementById('catalogGrid');
-
             try {
-                const { data, error } = await mbDb
-                    .from('productos')
-                    .select('*')
-                    .eq('client_id', CLIENT_ID)
-                    .order('id', { ascending: true });
-
+                const { data, error } = await mbDb.from('productos').select('*').eq('client_id', CLIENT_ID).order('id', { ascending: true });
                 if (error) {
                     grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: #bc4749;">Error al cargar la colección: ${error.message}</div>`;
                     return;
                 }
-
                 allProducts = data || [];
                 renderCategoryFilters();
                 renderProducts();
@@ -616,12 +594,9 @@
         function renderProducts() {
             const grid = document.getElementById('catalogGrid');
             const cats = getSavedCategories();
-            const catMap = {};
-            cats.forEach(c => catMap[c.id] = c.name);
+            const catMap = {}; cats.forEach(c => catMap[c.id] = c.name);
 
-            const filtered = currentFilter === 'todos' 
-                ? allProducts 
-                : allProducts.filter(p => p.categoria === currentFilter);
+            const filtered = currentFilter === 'todos' ? allProducts : allProducts.filter(p => p.categoria === currentFilter);
 
             if (filtered.length === 0) {
                 grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">No hay diseños disponibles en esta categoría actualmente.</div>`;
@@ -632,10 +607,9 @@
                 const categoryName = catMap[p.categoria] || p.categoria;
                 const priceText = p.precio ? `Desde ${p.precio} CLP` : '';
                 const imgSrc = p.foto || 'https://images.unsplash.com/photo-1546804735-85d1cb45e32e?w=600&auto=format&fit=crop&q=80';
-                const consultText = `Hola, me gustaría consultar y reservar una cita para el diseño: ${p.nombre}`;
 
                 return `
-                    <div class="dress-card">
+                    <div class="dress-card" onclick='openProductModal(${JSON.stringify(p).replace(/'/g, "&#39;")}, "${categoryName}")'>
                         <div class="dress-image-wrapper">
                             <img src="${imgSrc}" alt="${p.nombre}" onerror="this.src='https://images.unsplash.com/photo-1546804735-85d1cb45e32e?w=600&auto=format&fit=crop&q=80'">
                         </div>
@@ -643,16 +617,46 @@
                             <div class="dress-category">${categoryName}</div>
                             <h3 class="dress-title">${p.nombre}</h3>
                             <div class="dress-price">${priceText}</div>
-                            <button class="btn-detail" onclick="openWhatsApp('${consultText}')">Consultar / Reservar Cita</button>
+                            <button class="btn-detail" onclick="event.stopPropagation(); openProductModal(${JSON.stringify(p).replace(/'/g, "&#39;")}, "${categoryName}")">Ver Detalles y Tallas</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // Ejecutar funciones de inicialización
+        function openProductModal(product, categoryName) {
+            document.getElementById('modalImg').src = product.foto_grande || product.foto || 'https://images.unsplash.com/photo-1546804735-85d1cb45e32e?w=600&auto=format&fit=crop&q=80';
+            document.getElementById('modalCategory').innerText = categoryName;
+            document.getElementById('modalTitle').innerText = product.nombre;
+            document.getElementById('modalPrice').innerText = product.precio ? `${product.precio} CLP` : '';
+            document.getElementById('modalDescription').innerText = product.cuidados || 'Consúltanos los detalles de este hermoso diseño.';
+
+            const variantsBox = document.getElementById('modalVariants');
+            variantsBox.innerHTML = '';
+            if (product.opciones && Array.isArray(product.opciones) && product.opciones.length > 0) {
+                product.opciones.forEach(opt => {
+                    const pill = document.createElement('div');
+                    pill.className = 'variant-pill';
+                    pill.innerText = `📏 ${opt.name} (${opt.stock > 0 ? 'Disponible' : 'Agotado'})`;
+                    variantsBox.appendChild(pill);
+                });
+            } else {
+                variantsBox.innerHTML = '<span style="color:var(--text-muted); font-size:0.85rem;">Talla única / Consulta directa</span>';
+            }
+
+            const consultText = `Hola, me interesa conocer más y reservar una cita para el diseño: ${product.nombre}`;
+            document.getElementById('modalWhatsappBtn').onclick = () => openWhatsApp(consultText);
+
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        function closeProductModal(e) {
+            if (!e || e.target.id === 'productModal' || e.target.classList.contains('close-modal')) {
+                document.getElementById('productModal').style.display = 'none';
+            }
+        }
+
         loadDynamicSiteDesign();
-        checkClientStatusSupabase();
         fetchProductsFromSupabase();
     </script>
 </body>
